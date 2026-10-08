@@ -1,24 +1,52 @@
 # MAGUISSI BIRR — Application mobile QHSE & environnement
 
-Projet mobile indépendant de VJR 221, conçu pour la prévention QHSE, le signalement de situations à risque et la sensibilisation environnementale au Sénégal.
+Application mobile indépendante de VJR 221, orientée prévention QHSE, signalement de situations à risque et sensibilisation environnementale au Sénégal.
 
-## État du projet
+## État actuel
 
-Cette branche contient l'initialisation du dépôt. La base de démarrage Expo/React Native doit être ajoutée puis vérifiée avant toute publication. Aucune release n'est déclarée prête à ce stade.
+La base Expo/React Native est maintenant versionnée dans ce dépôt. Il s'agit d'un **prototype fonctionnel de départ**, pas encore d'une release de production validée. Les signalements sont enregistrés localement sur l'appareil et ne sont envoyés à aucun serveur.
+
+## Fonctionnalités de départ
+
+- Accueil mobile avec accès rapide aux fonctions principales.
+- Formulaire de signalement : catégorie, région, localité, description, GPS facultatif et sélection de photos.
+- Historique local des signalements.
+- Conseils de prévention sur les déchets, l'eau, l'énergie, la sécurité et la biodiversité.
+- Workflow GitHub Actions pour lancer le contrôle TypeScript.
+- Documentation et feuille de route de développement.
+
+## Lancer le projet
+
+Prérequis : Node.js 22 et npm.
+
+```bash
+npm install
+npx expo start
+```
+
+Puis ouvrir le projet dans Expo Go ou un émulateur compatible. Selon les versions des outils et de l'appareil, certaines fonctions natives (GPS, photos) devront être vérifiées sur un appareil réel.
+
+Contrôle TypeScript :
+
+```bash
+npm run typecheck
+```
+
+## Confidentialité et limites
+
+- Les signalements restent sur l'appareil avec AsyncStorage.
+- La référence générée est locale et ne constitue pas un numéro de dossier officiel.
+- Les photos sont référencées par URI locale ; le transfert et la gestion sécurisée des pièces jointes ne sont pas implémentés.
+- Le suivi à distance, les comptes utilisateurs et l'espace de gestion exigent une API sécurisée qui n'est pas encore configurée.
+- N'ajoutez jamais de clés, certificats ou secrets dans le dépôt.
 
 ## Principes
 
 - Dépôt, identité, versions et cycle de release indépendants de VJR 221.
-- Protection des données : expliquer clairement le stockage local et les envois réseau.
-- Pas de faux signalement envoyé : les rapports restent sur l'appareil tant qu'un backend sécurisé n'est pas configuré.
-- Conseils QHSE et environnement adaptés au contexte sénégalais.
+- Consentement clair pour l'accès à la localisation et aux photos.
+- Ne jamais demander à l'utilisateur de s'exposer à un danger pour documenter un incident.
+- Conseils adaptés au contexte sénégalais, à valider par des professionnels QHSE avant publication.
 
-## Périmètre prévu
+## Suite du développement
 
-- Accueil et navigation mobile moderne.
-- Conseils environnementaux et sécurité.
-- Création de signalements avec catégorie, région, description, photos et localisation facultative.
-- Historique des signalements locaux.
-- Tests, intégration continue et documentation avant la première release.
-
-Voir `docs/ROADMAP.md` pour la suite du développement.
+Consulter [la feuille de route](docs/ROADMAP.md). La migration du contenu historique doit être auditée avant d'être considérée comme terminée.
