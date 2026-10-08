@@ -7,6 +7,7 @@ import { REPORT_CATEGORIES, REGIONS } from '@/constants/categories';
 import { theme } from '@/constants/theme';
 import { saveReport } from '@/services/reportStore';
 import type { Report } from '@/types/report';
+import { validateDescription } from '@/utils/reportValidation';
 
 export default function NewReportScreen() {
   const [categoryId, setCategoryId] = useState<string>('environment');
@@ -30,7 +31,8 @@ export default function NewReportScreen() {
     if (!result.canceled) setPhotoUris(result.assets.slice(0, 3).map((asset) => asset.uri));
   }
   async function submit() {
-    if (description.trim().length < 12) return Alert.alert('Description trop courte', 'Décrivez la situation en au moins 12 caractères.');
+    const validationError = validateDescription(description);
+    if (validationError) return Alert.alert('Description à corriger', validationError);
     setSaving(true);
     try {
       const now = new Date().toISOString();
