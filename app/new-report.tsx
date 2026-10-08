@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View } from 'react-native';
 import { router } from 'expo-router';
 import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
@@ -30,6 +30,18 @@ export default function NewReportScreen() {
     const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.75, allowsMultipleSelection: true, selectionLimit: 3 });
     if (!result.canceled) setPhotoUris(result.assets.slice(0, 3).map((asset) => asset.uri));
   }
+  async function takePhoto() {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permission.granted) return Alert.alert('Accès à la caméra refusé', 'Vous pouvez continuer sans photo.');
+    try {
+      const result = await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], quality: 0.75 });
+      if (!result.canceled && result.assets[0]) {
+        setPhotoUris((current) => [...current, result.assets[0].uri].slice(0, 3));
+      }
+    } catch {
+      Alert.alert('Caméra indisponible', 'Vous pouvez choisir une photo dans votre galerie.');
+    }
+  }
   async function submit() {
     const validationError = validateDescription(description);
     if (validationError) return Alert.alert('Description à corriger', validationError);
@@ -39,7 +51,10 @@ export default function NewReportScreen() {
       const id = `${Date.now()}`;
       const report: Report = { id, reference: `MB-${new Date().getFullYear()}-${id.slice(-6)}`, categoryId, description: description.trim(), region, locality: locality.trim() || undefined, ...coords, photoUris, createdAt: now, status: 'RECEIVED', events: [{ status: 'RECEIVED', at: now, note: 'Enregistré sur cet appareil' }] };
       await saveReport(report);
-      Alert.alert('Signalement enregistré', `Votre référence locale : ${report.reference}. Elle est enregistrée sur cet appareil et n'a pas encore été transmise à un serveur.`, [{ text: 'Voir mes signalements', onPress: () => router.replace('/reports') }]);
+      Alert.alert('Signalement enregistré', `Référence locale : ${report.reference}. Elle est conservée sur cet appareil et n'a pas été transmise à un serveur.`, [
+        { text: 'Partager la référence', onPress: () => { void Share.share({ message: `MAGUISSI BIRR — Référence locale ${report.reference}. Ce signalement n'a pas encore été transmis à un serveur.` }); } },
+        { text: 'Voir mes signalements', onPress: () => router.replace('/reports') }
+      ]);
     } catch { Alert.alert('Enregistrement impossible', 'Vérifiez l’espace disponible puis réessayez.'); }
     finally { setSaving(false); }
   }
@@ -53,7 +68,7 @@ export default function NewReportScreen() {
     <Text style={styles.label}>Localité ou repère (facultatif)</Text><TextInput value={locality} onChangeText={setLocality} placeholder="Commune, quartier, rue…" placeholderTextColor={theme.colors.muted} style={styles.input} />
     <Text style={styles.label}>3. Description</Text><TextInput value={description} onChangeText={setDescription} multiline textAlignVertical="top" maxLength={2000} placeholder="Que s’est-il passé ? Où ? Quand ? Y a-t-il un danger immédiat ?" placeholderTextColor={theme.colors.muted} style={[styles.input, styles.textarea]} /><Text style={styles.counter}>{description.length}/2000</Text>
     <Text style={styles.label}>4. Éléments complémentaires (facultatif)</Text>
-    <View style={styles.row}><Pressable accessibilityRole="button" onPress={addLocation} style={styles.secondary}><Text style={styles.secondaryText}>{coords ? '✓ GPS ajouté' : '📍 Ajouter ma position'}</Text></Pressable><Pressable accessibilityRole="button" onPress={addPhoto} style={styles.secondary}><Text style={styles.secondaryText}>📷 Photos ({photoUris.length})</Text></Pressable></View>
+    <View style={styles.row}><Pressable accessibilityRole="button" onPress={addLocation} style={styles.secondary}><Text style={styles.secondaryText}>{coords ? '✓ GPS ajouté' : '📍 Ajouter ma position'}</Text></Pressable><Pressable accessibilityRole="button" onPress={takePhoto} style={styles.secondary}><Text style={styles.secondaryText}>📸 Prendre une photo</Text></Pressable><Pressable accessibilityRole="button" onPress={addPhoto} style={styles.secondary}><Text style={styles.secondaryText}>🖼️ Galerie ({photoUris.length}/3)</Text></Pressable></View>
     <Pressable accessibilityRole="button" disabled={saving} onPress={submit} style={[styles.submit, saving && { opacity: 0.6 }]}><Text style={styles.submitText}>{saving ? 'Enregistrement…' : 'Enregistrer le signalement'}</Text></Pressable>
     <Text style={styles.privacy}>Ne photographiez pas de personnes identifiables sans nécessité. Ne vous approchez pas de substances inconnues, d’un incendie ou d’une installation dangereuse.</Text>
   </ScrollView>;
