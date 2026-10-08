@@ -1,38 +1,50 @@
-# Feuille de route
+# Feuille de route MAGUISSI BIRR
 
 ## Phase 0 — séparation et audit
-- Dépôt GitHub dédié : `vjr221/maguissi-birr` (créé).
-- Importer la base de démarrage sans toucher au dépôt VJR 221.
-- Inventorier les fichiers de la branche historique `maguissi-birr` et migrer uniquement ceux qui appartiennent au produit.
-- Vérifier qu'aucune référence VJR 221, secret ou URL d'API VJR 221 n'est présente.
+- [x] Dépôt GitHub indépendant : `vjr221/maguissi-birr`.
+- [x] Reconstituer les documents de présentation, architecture, modèle de données et workflow QHSE depuis la branche historique.
+- [x] Reprendre la direction visuelle et les fonctions utiles dans une architecture mobile modulaire.
+- [x] Maintenir le dépôt et le cycle de release indépendants de VJR 221.
+- [ ] Vérifier les éléments de marque et licences avant migration éventuelle des ressources graphiques historiques.
 
-## Phase 1 — application mobile
-- Finaliser les écrans, navigation, accessibilité et validation des formulaires.
-- Ajouter tests unitaires et tests de parcours.
-- Tester permissions GPS/photos, mode avion, stockage insuffisant et erreurs.
-- Vérifier les données de référence régionales.
+## Phase 1 — prototype mobile enrichi
+- [x] Accueil et navigation de base.
+- [x] 11 catégories QHSE et 14 régions.
+- [x] Formulaire avec description, localité et GPS facultatif.
+- [x] Sélection de photos et capture caméra.
+- [x] Référence locale partageable, explicitement indiquée comme non officielle.
+- [x] Historique local avec recherche et statut en français.
+- [x] Conseils environnementaux et QHSE enrichis.
+- [x] Validation des descriptions et des données locales.
+- [x] Premiers tests unitaires et pipeline CI.
+- [ ] Tests sur appareils réels, permissions, redémarrage, médias et stockage insuffisant.
+- [ ] Affiner accessibilité, erreurs et détails de dossier.
 
-## Phase 2 — backend sécurisé
-- API versionnée, PostgreSQL et migrations.
-- Authentification, rôles, organisations et autorisations.
-- Téléversement sécurisé des pièces jointes, limites de taille et contrôle de contenu.
-- Références générées côté serveur ; historique de statut auditable.
-- Anti-abus, limitation de débit, sauvegardes, journalisation et supervision.
+## Phase 2 — MVP connecté
+- [ ] API REST versionnée et base PostgreSQL.
+- [ ] Authentification, rôles, organisations et autorisations.
+- [ ] Références officielles et jetons de suivi générés côté serveur.
+- [ ] Téléversement sécurisé des médias et validation serveur.
+- [ ] Historique d'événements auditable.
+- [ ] Notifications et synchronisation avec gestion claire des erreurs.
 
 ## Phase 3 — console professionnelle
-- Affectation des dossiers, équipes et organisations.
-- Qualification, demandes d'information, transfert et clôture motivée.
-- Délais de traitement, escalades, tableaux de bord et export contrôlé.
+- [ ] Qualification, affectation et transfert à une organisation compétente.
+- [ ] Actions correctives, preuves de résolution et clôture validée.
+- [ ] Délais de traitement, escalades et tableaux de bord.
+- [ ] Cartographie et filtres région / département / commune.
+- [ ] Exports contrôlés et rapports périodiques.
 
-## Phase 4 — release
-- Audit des dépendances et de sécurité.
-- Politique de confidentialité, conditions d'utilisation et contacts de support.
-- Builds Android/iOS reproductibles, signatures protégées par secrets CI.
-- Tests sur appareils réels, version bêta puis release publique.
+## Phase 4 — prévention et écosystème
+- [ ] Fiches pratiques enrichies et revues par des professionnels QHSE.
+- [ ] Micro-formations et campagnes de sensibilisation.
+- [ ] Partenariats avec organisations compétentes et collectivités.
+- [ ] Indicateurs agrégés et anonymisés, avec gouvernance définie.
 
-## Critères de sortie
-- Aucune dépendance à VJR 221.
-- Typecheck et tests verts.
-- Pas de secrets dans le dépôt.
-- Les limites de la version hors ligne sont expliquées clairement.
-- Backend et traitement des données validés avant toute annonce de suivi en ligne.
+## Conditions de publication
+- Typecheck et tests verts sur le commit candidat.
+- Essais sur appareils réels et revue de sécurité.
+- Politique de confidentialité, conditions d'utilisation et support validés.
+- Responsabilités QHSE et règles d'escalade confirmées.
+- Aucun statut distant simulé et aucune promesse de traitement serveur avant son implémentation.
+- Aucun secret dans Git ; builds signés via secrets protégés.
