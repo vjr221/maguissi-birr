@@ -1,14 +1,14 @@
 # MAGUISSI BIRR — Application mobile QHSE & environnement
 
-**Signaler. Suivre. Agir. Améliorer.**
+**Signaler. Suivre. Agir.**
 
-Application mobile indépendante de VJR 221, pensée pour la prévention QHSE, les signalements environnementaux et le suivi structuré des situations à risque au Sénégal.
+MAGUISSI BIRR est une application mobile conçue pour structurer les signalements de situations à risque, soutenir la prévention QHSE et diffuser des pratiques favorables à la protection de l'environnement. L'initiative est portée par **M. Diallo, manager de SEN ENVIRONNEMENT SERVICES (SES)**.
 
 ## État actuel
 
-Ce dépôt contient un prototype Expo / React Native / TypeScript : accueil, formulaire, catégories QHSE, 14 régions, GPS facultatif, sélection de photos et prise de photo, historique local avec recherche, conseils pratiques, validation des données, tests unitaires initiaux et workflow GitHub Actions.
+Ce dépôt contient une base mobile Expo / React Native / TypeScript : accueil, formulaire de signalement, catégories QHSE, 14 régions du Sénégal, GPS facultatif, sélection et capture de photos, historique local avec recherche, conseils pratiques, validation des données, tests unitaires initiaux et workflow GitHub Actions.
 
-**Ce n'est pas encore une release de production.** Les signalements restent sur le téléphone. Aucun serveur ne les reçoit et la référence créée localement n'est pas un numéro de dossier officiel.
+**Cette version est un prototype et n'est pas une release de production.** Les signalements restent sur le téléphone. Aucun serveur ne les reçoit et la référence créée localement n'est pas un numéro de dossier officiel.
 
 ## Démarrer
 
@@ -21,7 +21,16 @@ npm run typecheck
 npm test
 ```
 
-Tester GPS et médias sur un appareil réel. Consulter l'onglet Actions du dépôt pour l'état des contrôles.
+Tester le GPS et les médias sur un appareil réel. Consulter l'onglet Actions du dépôt pour l'état des contrôles.
+
+## Identité visuelle
+
+- Signature : **Signaler. Suivre. Agir.**
+- Logo vectoriel : [assets/branding/maguissi-birr-logo.svg](assets/branding/maguissi-birr-logo.svg)
+- Icône vectorielle de référence : [assets/branding/maguissi-birr-icon.svg](assets/branding/maguissi-birr-icon.svg)
+- Charte graphique : [docs/BRAND_GUIDE.md](docs/BRAND_GUIDE.md)
+
+Les SVG sont les sources vectorielles de marque. Les ressources PNG optimisées pour les icônes natives et l'écran de lancement doivent être exportées et testées avant une release mobile.
 
 ## Limites et confidentialité
 
@@ -34,6 +43,7 @@ Tester GPS et médias sur un appareil réel. Consulter l'onglet Actions du dép�
 ## Documentation
 
 - [Présentation du produit](docs/PROJECT_PRESENTATION.md)
+- [Identité visuelle](docs/BRAND_GUIDE.md)
 - [Architecture cible](docs/ARCHITECTURE.md)
 - [Modèle de données](docs/DATA_MODEL.md)
 - [Workflow QHSE](docs/WORKFLOW.md)
@@ -42,4 +52,10 @@ Tester GPS et médias sur un appareil réel. Consulter l'onglet Actions du dép�
 - [Feuille de route](docs/ROADMAP.md)
 - [Politique de sécurité](SECURITY.md)
 
-L'application doit rester indépendante de VJR 221. Aucune release publique ne sera considérée prête avant validation des tests, de la sécurité, des fonctions annoncées et de la gestion des données.
+## Initiative
+
+MAGUISSI BIRR est une initiative portée par M. Diallo, manager de [SEN ENVIRONNEMENT SERVICES (SES)](https://sen-environnement-services.com/). L'application conserve son identité numérique propre et poursuit un objectif de prévention, de sécurité et de protection de l'environnement.
+
+## Confidentialité et sécurité
+
+Aucune release publique ne sera considérée prête avant validation des tests, de la sécurité, des fonctions annoncées et de la gestion des données.

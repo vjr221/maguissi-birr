@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">MAGUISSI BIRR — icône</title><desc id="desc">Repère vert avec feuille, arc jaune et rouge et étoile, sur fond vert forêt.</desc>
+  <rect width="512" height="512" rx="104" fill="#103F2E"/>
+  <path d="M88 204 A178 178 0 0 1 420 188" fill="none" stroke="#FFD600" stroke-width="20" stroke-linecap="butt"/>
+  <path d="M420 188 A178 178 0 0 1 410 326" fill="none" stroke="#ED1C24" stroke-width="20" stroke-linecap="butt"/>
+  <path d="M256 45 270 79 307 82 279 106 287 142 256 123 225 142 233 106 205 82 242 79Z" fill="#D7F33D"/>
+  <circle cx="256" cy="254" r="112" fill="#103F2E" stroke="#FFFFFF" stroke-width="12"/>
+  <path d="M256 154c-58 0-105 46-105 104 0 26 10 51 27 69l78 103 78-103c17-18 27-43 27-69 0-58-47-104-105-104Z" fill="#39A64A"/>
+  <circle cx="256" cy="253" r="49" fill="#D7F33D"/>
+  <path d="M239 280c-3-27-19-42-36-47 2 21 14 39 36 47Zm7 3c6-30 23-52 44-63-1 29-15 52-44 63Z" fill="#103F2E"/>
+</svg>

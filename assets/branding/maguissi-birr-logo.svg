@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" role="img" aria-labelledby="title desc">
+<title id="title">MAGUISSI BIRR</title><desc id="desc">Logo officiel, repère végétal, étoile et couleurs du Sénégal. Signaler. Suivre. Agir.</desc>
+<defs><linearGradient id="green" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0B5737"/><stop offset="1" stop-color="#2D9B45"/></linearGradient></defs>
+<g transform="translate(65 25)">
+<path d="M85 225 A190 190 0 0 1 440 190" fill="none" stroke="#FFD600" stroke-width="23"/>
+<path d="M440 190 A190 190 0 0 1 423 338" fill="none" stroke="#ED1C24" stroke-width="23"/>
+<path d="M260 8 276 47 318 50 286 78 295 120 260 98 225 120 234 78 202 50 244 47Z" fill="#D7F33D"/>
+<circle cx="260" cy="246" r="128" fill="#103F2E" stroke="#FFFFFF" stroke-width="13"/>
+<path d="M260 145c-62 0-112 50-112 112 0 28 10 54 29 74l83 109 83-109c19-20 29-46 29-74 0-62-50-112-112-112Z" fill="url(#green)"/>
+<circle cx="260" cy="252" r="57" fill="#FFFFFF"/>
+<path d="M252 278c-4-32-23-49-43-55 2 25 17 46 43 55Zm9 2c7-35 27-61 51-74-1 34-18 61-51 74Z" fill="#238B48"/>
+</g>
+<text x="590" y="220" font-family="Arial, Helvetica, sans-serif" font-size="92" font-weight="800" letter-spacing="1" fill="#103F2E">MAGUISSI</text>
+<text x="590" y="325" font-family="Arial, Helvetica, sans-serif" font-size="100" font-weight="800" letter-spacing="5" fill="#2D9B45">BIRR</text>
+<path d="M595 355H1095" stroke="#176B4D" stroke-width="5" stroke-linecap="round"/>
+<text x="590" y="415" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="600" fill="#103F2E">Signaler. Suivre. Agir.</text>
+<text x="590" y="470" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#68756D">Prévention QHSE • Environnement • Sécurité</text>
+</svg>
