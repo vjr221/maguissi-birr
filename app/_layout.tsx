@@ -8,6 +8,7 @@ export default function RootLayout() {
     <Stack screenOptions={{ headerStyle: { backgroundColor: theme.colors.paper }, headerTintColor: theme.colors.ink, headerTitleStyle: { fontWeight: '700' }, contentStyle: { backgroundColor: theme.colors.paper } }}>
       <Stack.Screen name="index" options={{ title: 'MAGUISSI BIRR', headerShown: false }} />
       <Stack.Screen name="tips" options={{ title: 'Conseils pratiques' }} />
+      <Stack.Screen name="checklist" options={{ title: 'Checklist prévention QHSE' }} />
       <Stack.Screen name="reports" options={{ title: 'Mes signalements' }} />
       <Stack.Screen name="statistics" options={{ title: 'Statistiques' }} />
       <Stack.Screen name="operations" options={{ title: 'Centre d’opérations QHSE' }} />
