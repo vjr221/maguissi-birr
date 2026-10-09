@@ -53,7 +53,10 @@ Le serveur répond avec un code de création, une référence publique non séqu
 
 ## Notifications e-mail
 
-L'e-mail est créé seulement après validation et enregistrement transactionnel du dossier. Le message contient la référence, la priorité et un lien vers le portail protégé; pas de photos en pièce jointe par défaut. Les destinataires sont configurés côté serveur et non dans l'application. En cas d'échec, la notification est remise en file et une nouvelle tentative est journalisée.
+- Destinataire opérationnel initial demandé : `moctar.diallo@sen-environnement-services.com`, à enregistrer dans la configuration privée du serveur.
+- L'e-mail est créé seulement après validation et enregistrement transactionnel du dossier. Le message contient la référence, la priorité et un lien vers le portail protégé; pas de photos en pièce jointe par défaut.
+- Les destinataires et identifiants SMTP sont configurés côté serveur et non dans l'application mobile ou dans le dépôt public. Tester la délivrabilité avant production.
+- En cas d'échec, la notification est remise en file et une nouvelle tentative est journalisée. La mise en file doit être indépendante de la transaction de signalement afin qu'une panne d'e-mail ne fasse pas perdre le dossier.
 
 ## Contrôle d'accès
 
