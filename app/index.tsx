@@ -25,6 +25,7 @@ export default function HomeScreen() {
     <ActionCard icon="location-outline" title="Suivre un signalement" detail="Consultez votre historique et les statuts enregistrés" onPress={() => router.push('/reports')} />
     <ActionCard icon="stats-chart-outline" title="Statistiques de signalement" detail="Analyse par période, catégorie, région et statut" onPress={() => router.push('/statistics')} />
     <ActionCard icon="clipboard-outline" title="Centre d’opérations QHSE" detail="Trier les dossiers, suivre les priorités et tracer les changements de statut" onPress={() => router.push('/operations')} />
+    <ActionCard icon="clipboard-outline" title="Checklist prévention QHSE" detail="Vérifiez les réflexes essentiels avant d’agir" onPress={() => router.push('/checklist')} />
     <ActionCard icon="leaf-outline" title="Conseils environnementaux" detail="Des gestes concrets pour prévenir les risques" onPress={() => router.push('/tips')} />
     <ActionCard icon="call-outline" title="Contacter SES" detail="Appeler M. Diallo, écrire à SES ou découvrir ses services QHSE" onPress={() => router.push('/contact')} />
     <View style={styles.notice}><View style={styles.noticeHeading}><Ionicons name="shield-checkmark-outline" size={20} color="#715314" /><Text style={styles.noticeTitle}>Votre sécurité d’abord</Text></View><Text style={styles.noticeBody}>Ne vous exposez jamais à un danger pour recueillir des preuves. En cas d’urgence, contactez directement les services compétents.</Text></View>
