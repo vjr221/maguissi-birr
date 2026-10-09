@@ -93,7 +93,7 @@ jobs:
       - name: Publish APK as a public GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.event.head_commit.message }}
+          tag_name: v1.1.0
           name: MAGUISSI BIRR Android v1.1.0
           target_commitish: main
           generate_release_notes: true
