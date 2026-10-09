@@ -4,7 +4,7 @@ import { ENVIRONMENT_TIPS } from '@/features/environment/tips';
 import { theme } from '@/constants/theme';
 
 const categoryVisual: Record<string, { icon: keyof typeof Ionicons.glyphMap; color: string; background: string }> = {
-  'Déchets': { icon: 'recycle-outline', color: '#24724D', background: '#E6F4EA' },
+  'Déchets': { icon: 'trash-outline', color: '#24724D', background: '#E6F4EA' },
   'Eau': { icon: 'water-outline', color: '#1769AA', background: '#E5F2FF' },
   'Énergie': { icon: 'flash-outline', color: '#9A6B00', background: '#FFF3D3' },
   'Sécurité': { icon: 'shield-checkmark-outline', color: '#B45309', background: '#FFF0E1' },
