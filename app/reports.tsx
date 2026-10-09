@@ -117,6 +117,8 @@ const styles = StyleSheet.create({
   ref: { color: theme.colors.forest, fontWeight: '900' },
   description: { color: theme.colors.ink, fontWeight: '600' },
   meta: { color: theme.colors.muted, fontSize: 12 },
+  exportButton: { backgroundColor: theme.colors.ink, paddingVertical: 13, paddingHorizontal: 14, alignItems: 'center', borderRadius: 12 },
+  exportButtonText: { color: theme.colors.white, fontWeight: '800', fontSize: 13 },
   emailButton: { marginTop: 5, backgroundColor: theme.colors.forest, paddingVertical: 12, paddingHorizontal: 14, alignItems: 'center', borderRadius: 12 },
   emailButtonText: { color: theme.colors.white, fontWeight: '800', fontSize: 13 },
   shareButton: { borderColor: theme.colors.forest, borderWidth: 1, paddingVertical: 11, paddingHorizontal: 14, alignItems: 'center', borderRadius: 12 },
