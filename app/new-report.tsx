@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Alert, Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Image, Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View } from 'react-native';
 import { router } from 'expo-router';
 import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
@@ -25,12 +25,19 @@ export default function NewReportScreen() {
     catch { Alert.alert('Localisation indisponible', 'Réessayez ou continuez sans coordonnées.'); }
   }
   async function addPhoto() {
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) return Alert.alert('Accès aux photos refusé', 'Vous pouvez continuer sans photo.');
-    const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.75, allowsMultipleSelection: true, selectionLimit: 3 });
-    if (!result.canceled) setPhotoUris(result.assets.slice(0, 3).map((asset) => asset.uri));
+    if (photoUris.length >= 3) return Alert.alert('Limite de photos', 'Vous pouvez joindre au maximum 3 photos par signalement.');
+    try {
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permission.granted) return Alert.alert('Accès aux photos refusé', 'Vous pouvez continuer sans photo.');
+      const remaining = 3 - photoUris.length;
+      const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.75, allowsMultipleSelection: true, selectionLimit: remaining });
+      if (!result.canceled) setPhotoUris((current) => [...current, ...result.assets.map((asset) => asset.uri).filter((uri) => !current.includes(uri))].slice(0, 3));
+    } catch {
+      Alert.alert('Galerie indisponible', 'Vous pouvez continuer sans photo ou réessayer plus tard.');
+    }
   }
   async function takePhoto() {
+    if (photoUris.length >= 3) return Alert.alert('Limite de photos', 'Vous pouvez joindre au maximum 3 photos par signalement.');
     const permission = await ImagePicker.requestCameraPermissionsAsync();
     if (!permission.granted) return Alert.alert('Accès à la caméra refusé', 'Vous pouvez continuer sans photo.');
     try {
@@ -43,6 +50,7 @@ export default function NewReportScreen() {
     }
   }
   async function submit() {
+    if (saving) return;
     const validationError = validateDescription(description);
     if (validationError) return Alert.alert('Description à corriger', validationError);
     setSaving(true);
@@ -69,8 +77,9 @@ export default function NewReportScreen() {
     <Text style={styles.label}>3. Description</Text><TextInput value={description} onChangeText={setDescription} multiline textAlignVertical="top" maxLength={2000} placeholder="Que s’est-il passé ? Où ? Quand ? Y a-t-il un danger immédiat ?" placeholderTextColor={theme.colors.muted} style={[styles.input, styles.textarea]} /><Text style={styles.counter}>{description.length}/2000</Text>
     <Text style={styles.label}>4. Éléments complémentaires (facultatif)</Text>
     <View style={styles.row}><Pressable accessibilityRole="button" onPress={addLocation} style={styles.secondary}><Text style={styles.secondaryText}>{coords ? '✓ GPS ajouté' : '📍 Ajouter ma position'}</Text></Pressable><Pressable accessibilityRole="button" onPress={takePhoto} style={styles.secondary}><Text style={styles.secondaryText}>📸 Prendre une photo</Text></Pressable><Pressable accessibilityRole="button" onPress={addPhoto} style={styles.secondary}><Text style={styles.secondaryText}>🖼️ Galerie ({photoUris.length}/3)</Text></Pressable></View>
+    {photoUris.length > 0 && <View style={styles.photoPreviewList}>{photoUris.map((uri, index) => <View key={uri + index} style={styles.photoPreviewItem}><Image source={{ uri }} accessibilityLabel={'Photo ' + (index + 1) + ' du signalement'} style={styles.photoPreview} /><Pressable accessibilityRole="button" accessibilityLabel={'Supprimer la photo ' + (index + 1)} onPress={() => setPhotoUris((current) => current.filter((item) => item !== uri))} style={styles.removePhoto}><Text style={styles.removePhotoText}>×</Text></Pressable></View>)}</View>}
     <Pressable accessibilityRole="button" disabled={saving} onPress={submit} style={[styles.submit, saving && { opacity: 0.6 }]}><Text style={styles.submitText}>{saving ? 'Enregistrement…' : 'Enregistrer le signalement'}</Text></Pressable>
     <Text style={styles.privacy}>Ne photographiez pas de personnes identifiables sans nécessité. Ne vous approchez pas de substances inconnues, d’un incendie ou d’une installation dangereuse.</Text>
   </ScrollView>;
 }
-const styles = StyleSheet.create({ page: { padding: 18, gap: 12, paddingBottom: 32 }, intro: { color: theme.colors.muted, lineHeight: 21, marginBottom: 4 }, label: { color: theme.colors.ink, fontSize: 15, fontWeight: '800', marginTop: 7 }, categories: { gap: 8 }, category: { backgroundColor: theme.colors.white, borderWidth: 1, borderColor: theme.colors.border, padding: 13, borderRadius: 12 }, categorySelected: { borderColor: theme.colors.forest, backgroundColor: theme.colors.mint }, regions: { flexDirection: 'row', flexWrap: 'wrap', gap: 7 }, region: { paddingVertical: 9, paddingHorizontal: 11, borderWidth: 1, borderColor: theme.colors.border, borderRadius: 999, backgroundColor: theme.colors.white }, regionSelected: { backgroundColor: theme.colors.forest, borderColor: theme.colors.forest }, regionText: { color: theme.colors.ink, fontSize: 12 }, regionTextSelected: { color: theme.colors.white, fontWeight: '800' }, input: { backgroundColor: theme.colors.white, borderColor: theme.colors.border, borderWidth: 1, borderRadius: 13, padding: 13, color: theme.colors.ink, fontSize: 14 }, textarea: { minHeight: 130 }, counter: { textAlign: 'right', color: theme.colors.muted, fontSize: 11, marginTop: -7 }, row: { flexDirection: 'row', gap: 9 }, secondary: { flex: 1, borderWidth: 1, borderColor: theme.colors.forest, padding: 13, borderRadius: 12, alignItems: 'center' }, secondaryText: { color: theme.colors.forest, fontWeight: '700', fontSize: 12 }, submit: { backgroundColor: theme.colors.forest, borderRadius: 14, padding: 16, alignItems: 'center', marginTop: 8 }, submitText: { color: theme.colors.white, fontWeight: '800' }, privacy: { color: theme.colors.muted, fontSize: 11, lineHeight: 17, marginTop: 4 } });
+const styles = StyleSheet.create({ page: { padding: 18, gap: 12, paddingBottom: 32 }, intro: { color: theme.colors.muted, lineHeight: 21, marginBottom: 4 }, label: { color: theme.colors.ink, fontSize: 15, fontWeight: '800', marginTop: 7 }, categories: { gap: 8 }, category: { backgroundColor: theme.colors.white, borderWidth: 1, borderColor: theme.colors.border, padding: 13, borderRadius: 12 }, categorySelected: { borderColor: theme.colors.forest, backgroundColor: theme.colors.mint }, regions: { flexDirection: 'row', flexWrap: 'wrap', gap: 7 }, region: { paddingVertical: 9, paddingHorizontal: 11, borderWidth: 1, borderColor: theme.colors.border, borderRadius: 999, backgroundColor: theme.colors.white }, regionSelected: { backgroundColor: theme.colors.forest, borderColor: theme.colors.forest }, regionText: { color: theme.colors.ink, fontSize: 12 }, regionTextSelected: { color: theme.colors.white, fontWeight: '800' }, input: { backgroundColor: theme.colors.white, borderColor: theme.colors.border, borderWidth: 1, borderRadius: 13, padding: 13, color: theme.colors.ink, fontSize: 14 }, textarea: { minHeight: 130 }, counter: { textAlign: 'right', color: theme.colors.muted, fontSize: 11, marginTop: -7 }, row: { flexDirection: 'row', flexWrap: 'wrap', gap: 9 }, photoPreviewList: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 3 }, photoPreviewItem: { width: 86, height: 86, position: 'relative' }, photoPreview: { width: 86, height: 86, borderRadius: 12, backgroundColor: theme.colors.border }, removePhoto: { position: 'absolute', top: 4, right: 4, width: 25, height: 25, borderRadius: 13, backgroundColor: '#17211B', alignItems: 'center', justifyContent: 'center' }, removePhotoText: { color: '#FFFFFF', fontSize: 20, lineHeight: 22, fontWeight: '700' }, secondary: { flex: 1, borderWidth: 1, borderColor: theme.colors.forest, padding: 13, borderRadius: 12, alignItems: 'center' }, secondaryText: { color: theme.colors.forest, fontWeight: '700', fontSize: 12 }, submit: { backgroundColor: theme.colors.forest, borderRadius: 14, padding: 16, alignItems: 'center', marginTop: 8 }, submitText: { color: theme.colors.white, fontWeight: '800' }, privacy: { color: theme.colors.muted, fontSize: 11, lineHeight: 17, marginTop: 4 } });
