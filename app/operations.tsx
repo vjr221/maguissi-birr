@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useFocusEffect } from 'expo-router';
-import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { REPORT_CATEGORIES } from '@/constants/categories';
 import { theme } from '@/constants/theme';
@@ -37,6 +37,7 @@ export default function OperationsScreen() {
   const [filter, setFilter] = useState<QueueFilter>('open');
   const [query, setQuery] = useState('');
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [expandedIds, setExpandedIds] = useState<string[]>([]);
   const refresh = useCallback(async () => {
     setLoading(true);
     try { setReports(await listReports()); }
@@ -72,6 +73,17 @@ export default function OperationsScreen() {
       Alert.alert('Modification non enregistrée', 'Le changement de statut n’a pas pu être sauvegardé sur cet appareil.');
     } finally { setSavingId(null); }
   };
+  const requestStatusChange = (report: Report, status: ReportStatus) => {
+    if (status === 'RESOLVED') {
+      Alert.alert('Confirmer la résolution', 'Confirmez-vous que le problème a été traité ? Cette action sera enregistrée localement sur cet appareil.', [
+        { text: 'Annuler', style: 'cancel' },
+        { text: 'Confirmer', onPress: () => { void changeStatus(report, status); } }
+      ]);
+      return;
+    }
+    void changeStatus(report, status);
+  };
+  const toggleDetails = (id: string) => setExpandedIds((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
   return <ScrollView contentContainerStyle={styles.page}>
     <View style={styles.hero}>
       <View style={styles.heroTop}><View style={styles.heroIcon}><Ionicons name="clipboard-outline" size={24} color={theme.colors.forest} /></View><View style={{ flex: 1 }}><Text style={styles.eyebrow}>MAGUISSI BIRR · QHSE</Text><Text style={styles.heroTitle}>Centre d’opérations</Text></View><Pressable accessibilityRole="button" accessibilityLabel="Actualiser" onPress={refresh} style={styles.refresh}><Ionicons name="refresh-outline" size={20} color={theme.colors.white} /></Pressable></View>
@@ -92,7 +104,17 @@ export default function OperationsScreen() {
         <View style={styles.metaRow}><Ionicons name="location-outline" size={14} color={theme.colors.muted} /><Text style={styles.meta}>{report.region}{report.locality ? ` · ${report.locality}` : ''}</Text></View>
         <View style={styles.reportFoot}><Text style={styles.status}>{statusLabel(report.status)}</Text><Text style={styles.date}>{new Date(report.createdAt).toLocaleDateString('fr-FR')}</Text></View>
         <Text style={styles.actionsLabel}>Tracer une action</Text>
-        <View style={styles.actions}>{ACTIONS.filter((a) => a.status !== report.status && !DONE.includes(report.status)).map((action) => <Pressable key={action.status} accessibilityRole="button" disabled={busy} onPress={() => changeStatus(report, action.status)} style={({ pressed }) => [styles.actionButton, pressed && styles.actionPressed, busy && { opacity: 0.5 }]}><Ionicons name={action.icon} size={15} color={theme.colors.forest} /><Text style={styles.actionText}>{action.label}</Text></Pressable>)}</View>
+        <View style={styles.actions}>{ACTIONS.filter((a) => a.status !== report.status && !DONE.includes(report.status)).map((action) => <Pressable key={action.status} accessibilityRole="button" disabled={busy} onPress={() => requestStatusChange(report, action.status)} style={({ pressed }) => [styles.actionButton, pressed && styles.actionPressed, busy && { opacity: 0.5 }]}><Ionicons name={action.icon} size={15} color={theme.colors.forest} /><Text style={styles.actionText}>{action.label}</Text></Pressable>)}</View>
+        <Pressable accessibilityRole="button" accessibilityState={{ expanded: expandedIds.includes(report.id) }} onPress={() => toggleDetails(report.id)} style={styles.detailsToggle}><Ionicons name={expandedIds.includes(report.id) ? 'chevron-up-outline' : 'chevron-down-outline'} size={16} color={theme.colors.forest} /><Text style={styles.detailsToggleText}>{expandedIds.includes(report.id) ? 'Masquer les détails' : 'Voir la chronologie et les pièces jointes'}</Text></Pressable>
+        {expandedIds.includes(report.id) && <View style={styles.detailsPanel}>
+          <Text style={styles.detailsTitle}>Chronologie</Text>
+          {report.events.length === 0 ? <Text style={styles.detailsText}>Aucun événement dans l’historique.</Text> : [...report.events].reverse().map((event, index) => <View key={event.at + event.status + index} style={styles.eventRow}><View style={styles.eventDot} /><View style={{ flex: 1, gap: 2 }}><Text style={styles.eventStatus}>{statusLabel(event.status)}</Text><Text style={styles.detailsText}>{new Date(event.at).toLocaleString('fr-FR')}{event.note ? ' · ' + event.note : ''}</Text></View></View>)}
+          <Text style={styles.detailsTitle}>Localisation et pièces jointes</Text>
+          {typeof report.latitude === 'number' && typeof report.longitude === 'number' ? <Text style={styles.detailsText}>GPS : {report.latitude.toFixed(5)}, {report.longitude.toFixed(5)}</Text> : <Text style={styles.detailsText}>Aucune coordonnée GPS enregistrée.</Text>}
+          <Text style={styles.detailsText}>{report.photoUris.length} photo(s) jointe(s) sur cet appareil.</Text>
+          {report.photoUris.length > 0 && <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.photoRow}>{report.photoUris.map((uri, index) => <Image key={uri + index} source={{ uri }} accessibilityLabel={'Photo du signalement ' + (index + 1)} style={styles.photo} />)}</ScrollView>}
+          <Text style={styles.detailsDisclaimer}>Détails et pièces jointes stockés localement. Ils ne sont pas encore partagés avec un serveur SES.</Text>
+        </View>}
         <Text style={styles.history}>{report.events.length} événement(s) dans l’historique local</Text>
       </View>;
     })}
@@ -142,6 +164,17 @@ const styles = StyleSheet.create({
   actionButton: { flexDirection: 'row', alignItems: 'center', gap: 5, borderWidth: 1, borderColor: theme.colors.border, backgroundColor: theme.colors.paper, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 8 },
   actionPressed: { opacity: 0.7 },
   actionText: { color: theme.colors.forest, fontSize: 10, fontWeight: '800' },
+  detailsToggle: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 8 },
+  detailsToggleText: { color: theme.colors.forest, fontSize: 11, fontWeight: '900' },
+  detailsPanel: { backgroundColor: theme.colors.paper, borderRadius: 12, padding: 12, gap: 9 },
+  detailsTitle: { color: theme.colors.forest, fontSize: 12, fontWeight: '900', marginTop: 2 },
+  detailsText: { color: theme.colors.muted, fontSize: 10, lineHeight: 15 },
+  eventRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
+  eventDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: theme.colors.forest, marginTop: 4 },
+  eventStatus: { color: theme.colors.ink, fontSize: 11, fontWeight: '800' },
+  photoRow: { gap: 8, paddingVertical: 4 },
+  photo: { width: 92, height: 92, borderRadius: 10, backgroundColor: theme.colors.border },
+  detailsDisclaimer: { color: '#715F36', fontSize: 10, lineHeight: 15 },
   history: { color: theme.colors.muted, fontSize: 10, marginTop: 2 },
   footerCard: { flexDirection: 'row', alignItems: 'flex-start', gap: 9, padding: 14, backgroundColor: theme.colors.mint, borderRadius: 14 },
   footerText: { flex: 1, color: theme.colors.forest, fontSize: 11, lineHeight: 17 }
