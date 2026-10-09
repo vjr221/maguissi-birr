@@ -46,8 +46,17 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Accept Android SDK licenses non-interactively
+        shell: bash
+        run: |
+          set -e
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKMANAGER" ]; then
+            echo "sdkmanager not found at $SDKMANAGER"
+            find "$ANDROID_HOME/cmdline-tools" -maxdepth 3 -name sdkmanager -type f -print
+            exit 1
+          fi
+          yes | "$SDKMANAGER" --licenses || true
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund
