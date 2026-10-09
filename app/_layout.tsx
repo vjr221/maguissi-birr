@@ -10,6 +10,7 @@ export default function RootLayout() {
       <Stack.Screen name="tips" options={{ title: 'Conseils pratiques' }} />
       <Stack.Screen name="reports" options={{ title: 'Mes signalements' }} />
       <Stack.Screen name="new-report" options={{ title: 'Nouveau signalement' }} />
+      <Stack.Screen name="contact" options={{ title: 'Contacter SES' }} />
     </Stack>
   </>;
 }
