@@ -110,12 +110,13 @@ jobs:
           profile: pixel_6
           script: |
             set -e
+            unzip -l android/app/build/outputs/apk/release/app-release.apk | grep -q "assets/index.android.bundle" || { echo "Release APK is missing assets/index.android.bundle"; exit 1; }
             adb install -r android/app/build/outputs/apk/release/app-release.apk
             adb logcat -c
             adb shell monkey -p sn.maguissi.birr 1
             sleep 20
             if ! adb shell pidof sn.maguissi.birr >/dev/null; then echo "MAGUISSI BIRR process is not running after launch."; adb logcat -d -v threadtime -s AndroidRuntime ReactNativeJS Expo; exit 1; fi
-            if adb logcat -d -v brief -s AndroidRuntime ReactNativeJS | grep -E "FATAL EXCEPTION|Fatal signal|Unhandled JS Exception"; then echo "Crash signature detected in Android logs."; adb logcat -d -v threadtime -s AndroidRuntime ReactNativeJS Expo; exit 1; fi
+            if adb logcat -d -v brief -s AndroidRuntime ReactNativeJS | grep -E "FATAL EXCEPTION|Fatal signal|Unhandled JS Exception|Unable to load script|Could not connect to development server"; then echo "Crash signature detected in Android logs."; adb logcat -d -v threadtime -s AndroidRuntime ReactNativeJS Expo; exit 1; fi
             echo "Cold-start smoke test passed: process remains alive and no fatal signature was found."
 
       - name: Upload installable APK
