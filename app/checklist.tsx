@@ -84,7 +84,7 @@ export default function ChecklistScreen() {
       <Text style={styles.heroBody}>Une aide-mémoire simple pour repérer les points à vérifier dans une zone de travail ou un environnement d’activité.</Text>
       <Text style={styles.savedNote}>{loaded ? 'Votre progression est conservée sur cet appareil.' : 'Récupération de votre progression…'}</Text>
       <View style={styles.progressTop}><Text style={styles.progressLabel}>Points vérifiés</Text><Text style={styles.progressValue}>{completed}/{allItems.length}</Text></View>
-      <View style={styles.progressTrack}><View style={[styles.progressFill, { width: progress + '%' }]} /></View>
+      <View style={styles.progressTrack}><View style={[styles.progressFill, { width: `${progress}%` as `${number}%` }]} /></View>
     </View>
 
     <View style={styles.warning}>
