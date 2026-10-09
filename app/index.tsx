@@ -23,6 +23,7 @@ export default function HomeScreen() {
     </View>
     <Text style={styles.sectionTitle}>Que souhaitez-vous faire ?</Text>
     <ActionCard icon="location-outline" title="Suivre un signalement" detail="Consultez votre historique et les statuts enregistrés" onPress={() => router.push('/reports')} />
+    <ActionCard icon="stats-chart-outline" title="Statistiques de signalement" detail="Analyse par période, catégorie, région et statut" onPress={() => router.push('/statistics')} />
     <ActionCard icon="leaf-outline" title="Conseils environnementaux" detail="Des gestes concrets pour prévenir les risques" onPress={() => router.push('/tips')} />
     <ActionCard icon="call-outline" title="Contacter SES" detail="Appeler M. Diallo, écrire à SES ou découvrir ses services QHSE" onPress={() => router.push('/contact')} />
     <View style={styles.notice}><View style={styles.noticeHeading}><Ionicons name="shield-checkmark-outline" size={20} color="#715314" /><Text style={styles.noticeTitle}>Votre sécurité d’abord</Text></View><Text style={styles.noticeBody}>Ne vous exposez jamais à un danger pour recueillir des preuves. En cas d’urgence, contactez directement les services compétents.</Text></View>
@@ -38,7 +39,6 @@ const styles = StyleSheet.create({
   brandName: { color: theme.colors.white, fontWeight: '900', fontSize: 20, letterSpacing: 0.3 },
   brandNameAccent: { color: theme.colors.gold },
   brandSlogan: { color: '#D7F0E0', fontSize: 11, fontWeight: '600', marginTop: 2, letterSpacing: 0.5 },
-  brandMarkText: { color: theme.colors.forest, fontWeight: '900', fontSize: 17 },
   eyebrow: { color: '#BDE7CD', fontSize: 11, letterSpacing: 2, fontWeight: '800' },
   heroTitle: { color: theme.colors.white, fontSize: 28, lineHeight: 34, fontWeight: '800' },
   heroBody: { color: '#E0F2E7', fontSize: 15 },
