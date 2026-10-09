@@ -1,0 +1,100 @@
+name: MAGUISSI BIRR — Release Android
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "app/**"
+      - "assets/**"
+      - "constants/**"
+      - "app.json"
+      - "package.json"
+      - ".github/workflows/release-android.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: maguissi-birr-final-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: startsWith(github.event.head_commit.message, 'Release MAGUISSI BIRR v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Accept Android SDK licenses
+        shell: bash
+        run: |
+          set -e
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKMANAGER" --licenses || true
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Check Expo dependencies
+        run: npx expo install --check
+
+      - name: Run Expo Doctor
+        run: npx expo-doctor
+
+      - name: TypeScript and tests
+        run: |
+          npm run typecheck
+          npm test -- --passWithNoTests
+
+      - name: Export Android JavaScript bundle
+        run: npx expo export --platform android
+
+      - name: Generate Android native project
+        run: npx expo prebuild --platform android --no-install --non-interactive
+
+      - name: Build release APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleRelease
+
+      - name: Verify APK contains the JavaScript bundle
+        run: unzip -l android/app/build/outputs/apk/release/app-release.apk | grep -q "assets/index.android.bundle"
+
+      - name: Install and cold-start test on Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          profile: pixel_6
+          script: |
+            set -e
+            adb install -r android/app/build/outputs/apk/release/app-release.apk
+            adb logcat -c
+            adb shell monkey -p sn.maguissi.birr 1
+            sleep 20
+            if ! adb shell pidof sn.maguissi.birr >/dev/null; then echo "App process stopped after launch."; adb logcat -d -v threadtime -s AndroidRuntime ReactNativeJS Expo; exit 1; fi
+            if adb logcat -d -v brief -s AndroidRuntime ReactNativeJS | grep -E "FATAL EXCEPTION|Fatal signal|Unhandled JS Exception|Unable to load script|Could not connect to development server"; then echo "App startup error detected."; adb logcat -d -v threadtime -s AndroidRuntime ReactNativeJS Expo; exit 1; fi
+            echo "Release APK cold-start test passed."
+
+      - name: Publish APK as a public GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.head_commit.message }}
+          name: MAGUISSI BIRR Android v1.1.0
+          target_commitish: main
+          generate_release_notes: true
+          files: android/app/build/outputs/apk/release/app-release.apk
