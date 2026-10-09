@@ -35,7 +35,7 @@ export default function ReportsScreen() {
       report.description,
       '',
       'Important : ces informations proviennent du stockage local de l’appareil. Elles ne prouvent pas que SES a reçu ou enregistré ce signalement. Vérifiez les destinataires avant de partager.'
-    ].join('\\n');
+    ].join('\n');
     try {
       await Share.share({ title: `Signalement ${report.reference}`, message: summary });
     } catch {
