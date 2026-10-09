@@ -96,11 +96,11 @@ jobs:
       - name: Generate Android native project
         run: npx expo prebuild --platform android --no-install --non-interactive
 
-      - name: Build debug APK
+      - name: Build release APK with embedded JavaScript bundle
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew --no-daemon assembleDebug
+          ./gradlew --no-daemon assembleRelease
 
       - name: Install and cold-start app on Android emulator
         uses: reactivecircus/android-emulator-runner@v2
@@ -110,7 +110,7 @@ jobs:
           profile: pixel_6
           script: |
             set -e
-            adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+            adb install -r android/app/build/outputs/apk/release/app-release.apk
             adb logcat -c
             adb shell monkey -p sn.maguissi.birr 1
             sleep 20
@@ -121,7 +121,7 @@ jobs:
       - name: Upload installable APK
         uses: actions/upload-artifact@v4
         with:
-          name: maguissi-birr-android-debug-${{ github.sha }}
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: maguissi-birr-android-release-${{ github.sha }}
+          path: android/app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
           retention-days: 14
