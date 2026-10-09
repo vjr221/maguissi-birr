@@ -44,9 +44,9 @@ concurrency:
 
 jobs:
   build-debug-apk:
-    name: Build and cold-start test Android debug APK
+    name: Validate, build and cold-start test Android APK
     runs-on: ubuntu-latest
-    timeout-minutes: 50
+    timeout-minutes: 55
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -74,13 +74,24 @@ jobs:
           fi
           yes | "$SDKMANAGER" --licenses || true
 
+      # This repository currently has no package-lock.json, so npm ci would fail.
+      # Keep npm install until a lockfile is generated and committed.
       - name: Install dependencies
         run: npm install --no-audit --no-fund
+
+      - name: Check Expo dependency compatibility
+        run: npx expo install --check
+
+      - name: Run Expo Doctor
+        run: npx expo-doctor
 
       - name: Validate TypeScript and tests
         run: |
           npm run typecheck
           npm test -- --passWithNoTests
+
+      - name: Export Android JavaScript bundle
+        run: npx expo export --platform android
 
       - name: Generate Android native project
         run: npx expo prebuild --platform android --no-install --non-interactive
