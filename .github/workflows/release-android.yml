@@ -29,7 +29,9 @@ jobs:
 
       - name: Read app version
         id: release_meta
-        run: echo "version=$(node -p \"require('./app.json').expo.version\")" >> "$GITHUB_OUTPUT"
+        run: |
+          VERSION=$(grep -o '"version": "[^"]*"' app.json | head -n 1 | cut -d '"' -f 4)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
