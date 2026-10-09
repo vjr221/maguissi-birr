@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useFocusEffect } from 'expo-router';
-import { Alert, Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Linking, Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View } from 'react-native';
 import { listReports } from '@/services/reportStore';
 import type { Report } from '@/types/report';
 import { theme } from '@/constants/theme';
@@ -20,6 +20,28 @@ export default function ReportsScreen() {
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
   }, []));
+
+  const shareSummary = async (report: Report) => {
+    const category = REPORT_CATEGORIES.find((item) => item.id === report.categoryId)?.label ?? 'Autre situation';
+    const summary = [
+      'MAGUISSI BIRR — Résumé de signalement',
+      `Référence locale : ${report.reference}`,
+      `Catégorie : ${category}`,
+      `Lieu : ${report.region}${report.locality ? ' — ' + report.locality : ''}`,
+      `Statut local : ${statusLabel(report.status)}`,
+      `Date : ${new Date(report.createdAt).toLocaleString('fr-FR')}`,
+      '',
+      'Description :',
+      report.description,
+      '',
+      'Important : ces informations proviennent du stockage local de l’appareil. Elles ne prouvent pas que SES a reçu ou enregistré ce signalement. Vérifiez les destinataires avant de partager.'
+    ].join('\\n');
+    try {
+      await Share.share({ title: `Signalement ${report.reference}`, message: summary });
+    } catch {
+      Alert.alert('Partage indisponible', 'Le résumé n’a pas pu être partagé. Vous pouvez réessayer ou utiliser la préparation par e-mail.');
+    }
+  };
 
   const prepareEmail = (report: Report) => {
     const category = REPORT_CATEGORIES.find((item) => item.id === report.categoryId)?.label ?? 'Autre situation';
@@ -74,6 +96,9 @@ export default function ReportsScreen() {
       <Pressable accessibilityRole="button" onPress={() => prepareEmail(report)} style={({ pressed }) => [styles.emailButton, pressed && { opacity: 0.8 }]}>
         <Text style={styles.emailButtonText}>Préparer un e-mail à SES</Text>
       </Pressable>
+      <Pressable accessibilityRole="button" onPress={() => shareSummary(report)} style={({ pressed }) => [styles.shareButton, pressed && { opacity: 0.8 }]}>
+        <Text style={styles.shareButtonText}>Partager le résumé…</Text>
+      </Pressable>
     </View>)}
   </ScrollView>;
 }
@@ -93,5 +118,7 @@ const styles = StyleSheet.create({
   description: { color: theme.colors.ink, fontWeight: '600' },
   meta: { color: theme.colors.muted, fontSize: 12 },
   emailButton: { marginTop: 5, backgroundColor: theme.colors.forest, paddingVertical: 12, paddingHorizontal: 14, alignItems: 'center', borderRadius: 12 },
-  emailButtonText: { color: theme.colors.white, fontWeight: '800', fontSize: 13 }
+  emailButtonText: { color: theme.colors.white, fontWeight: '800', fontSize: 13 },
+  shareButton: { borderColor: theme.colors.forest, borderWidth: 1, paddingVertical: 11, paddingHorizontal: 14, alignItems: 'center', borderRadius: 12 },
+  shareButtonText: { color: theme.colors.forest, fontWeight: '800', fontSize: 13 }
 });
