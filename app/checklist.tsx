@@ -1,10 +1,13 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '@/constants/theme';
 
 type CheckItem = { id: string; title: string; detail: string };
 type CheckSection = { id: string; title: string; icon: keyof typeof Ionicons.glyphMap; color: string; background: string; items: CheckItem[] };
+
+const CHECKLIST_KEY = 'maguissi-birr:prevention-checklist:v1';
 
 const SECTIONS: CheckSection[] = [
   {
@@ -36,6 +39,30 @@ const SECTIONS: CheckSection[] = [
 export default function ChecklistScreen() {
   const [checked, setChecked] = useState<string[]>([]);
   const [acknowledged, setAcknowledged] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    AsyncStorage.getItem(CHECKLIST_KEY).then((raw) => {
+      if (!active || !raw) return;
+      try {
+        const parsed: unknown = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.every((item) => typeof item === 'string')) setChecked(parsed);
+      } catch {
+        // Ignore invalid local checklist data and start with an empty checklist.
+      }
+    }).catch(() => {
+      // The checklist remains usable if local storage is temporarily unavailable.
+    }).finally(() => { if (active) setLoaded(true); });
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    if (!loaded) return;
+    AsyncStorage.setItem(CHECKLIST_KEY, JSON.stringify(checked)).catch(() => {
+      // No server sync: a storage error must not block the checklist UI.
+    });
+  }, [checked, loaded]);
   const allItems = useMemo(() => SECTIONS.flatMap((section) => section.items), []);
   const completed = allItems.filter((item) => checked.includes(item.id)).length;
   const progress = Math.round((completed / allItems.length) * 100);
@@ -55,6 +82,7 @@ export default function ChecklistScreen() {
       <Text style={styles.eyebrow}>PRÉVENTION · CONTRÔLE VISUEL</Text>
       <Text style={styles.heroTitle}>Les bons réflexes avant d’agir.</Text>
       <Text style={styles.heroBody}>Une aide-mémoire simple pour repérer les points à vérifier dans une zone de travail ou un environnement d’activité.</Text>
+      <Text style={styles.savedNote}>{loaded ? 'Votre progression est conservée sur cet appareil.' : 'Récupération de votre progression…'}</Text>
       <View style={styles.progressTop}><Text style={styles.progressLabel}>Points vérifiés</Text><Text style={styles.progressValue}>{completed}/{allItems.length}</Text></View>
       <View style={styles.progressTrack}><View style={[styles.progressFill, { width: progress + '%' }]} /></View>
     </View>
@@ -100,6 +128,7 @@ const styles = StyleSheet.create({
   eyebrow: { color: '#BDE7CD', fontSize: 10, fontWeight: '900', letterSpacing: 1.4 },
   heroTitle: { color: '#FFFFFF', fontSize: 25, lineHeight: 31, fontWeight: '900' },
   heroBody: { color: '#E0F2E7', fontSize: 13, lineHeight: 20 },
+  savedNote: { color: '#BDE7CD', fontSize: 10, fontWeight: '700' },
   progressTop: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 },
   progressLabel: { color: '#D7F0E0', fontSize: 12, fontWeight: '700' },
   progressValue: { color: '#FFFFFF', fontSize: 12, fontWeight: '900' },
