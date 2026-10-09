@@ -36,6 +36,7 @@ Tester GPS et médias sur un appareil réel. Consulter l'onglet Actions du dép�
 - [Présentation du produit](docs/PROJECT_PRESENTATION.md)
 - [Architecture cible](docs/ARCHITECTURE.md)
 - [Plan d’intégration avec le site SES](docs/SES_INTEGRATION.md)
+- [Contrat API et critères d’acceptation](docs/API_CONTRACT.md)
 - [Modèle de données](docs/DATA_MODEL.md)
 - [Workflow QHSE](docs/WORKFLOW.md)
 - [Guide environnemental](docs/ENVIRONMENT_GUIDE.md)
