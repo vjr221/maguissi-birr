@@ -7,9 +7,31 @@
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "ios": { "supportsTablet": true, "bundleIdentifier": "sn.maguissi.birr" },
-    "android": { "package": "sn.maguissi.birr", "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION", "CAMERA"] },
-    "plugins": ["expo-router", "expo-location", ["expo-image-picker", { "photosPermission": "Autorisez MAGUISSI BIRR à joindre une photo à un signalement.", "cameraPermission": "Autorisez MAGUISSI BIRR à photographier une situation à signaler." }]],
-    "experiments": { "typedRoutes": true }
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "sn.maguissi.birr"
+    },
+    "android": {
+      "package": "sn.maguissi.birr",
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "CAMERA"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      "expo-location",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Autorisez MAGUISSI BIRR à joindre une photo à un signalement.",
+          "cameraPermission": "Autorisez MAGUISSI BIRR à photographier une situation à signaler."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
   }
 }

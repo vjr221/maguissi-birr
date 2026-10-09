@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { ScrollView, StyleSheet, Text, View, Pressable } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, Pressable, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '@/constants/theme';
 
@@ -14,7 +14,7 @@ function ActionCard({ icon, title, detail, onPress }: { icon: string; title: str
 export default function HomeScreen() {
   return <ScrollView contentContainerStyle={styles.page}>
     <View style={styles.hero}>
-      <View style={styles.brandMark}><Ionicons name="leaf" size={27} color={theme.colors.forest} /></View>
+      <View style={styles.brandHeader}><Image source={require('../assets/app-icon.png')} style={styles.brandLogo} resizeMode="contain" /><View><Text style={styles.brandName}>MAGUISSI <Text style={styles.brandNameAccent}>BIRR</Text></Text><Text style={styles.brandSlogan}>Signaler. Suivre. Agir.</Text></View></View>
       <Text style={styles.eyebrow}>ENSEMBLE, AGISSONS</Text>
       <Text style={styles.heroTitle}>Un environnement plus sûr commence par un signalement.</Text>
       <Text style={styles.heroBody}>Observez. Signalez. Suivez les actions.</Text>
@@ -32,7 +32,11 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   page: { padding: 18, paddingBottom: 36, gap: 16 },
   hero: { backgroundColor: theme.colors.forest, borderRadius: 28, padding: 22, paddingTop: 26, gap: 12, overflow: 'hidden' },
-  brandMark: { width: 48, height: 48, borderRadius: 16, backgroundColor: theme.colors.white, alignItems: 'center', justifyContent: 'center' },
+  brandHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 4 },
+  brandLogo: { width: 54, height: 54, borderRadius: 16, backgroundColor: theme.colors.white },
+  brandName: { color: theme.colors.white, fontWeight: '900', fontSize: 20, letterSpacing: 0.3 },
+  brandNameAccent: { color: theme.colors.gold },
+  brandSlogan: { color: '#D7F0E0', fontSize: 11, fontWeight: '600', marginTop: 2, letterSpacing: 0.5 },
   brandMarkText: { color: theme.colors.forest, fontWeight: '900', fontSize: 17 },
   eyebrow: { color: '#BDE7CD', fontSize: 11, letterSpacing: 2, fontWeight: '800' },
   heroTitle: { color: theme.colors.white, fontSize: 28, lineHeight: 34, fontWeight: '800' },
