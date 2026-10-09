@@ -2,6 +2,22 @@ name: MAGUISSI BIRR Android test APK
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - "app/**"
+      - "components/**"
+      - "constants/**"
+      - "features/**"
+      - "services/**"
+      - "types/**"
+      - "utils/**"
+      - "assets/**"
+      - "app.json"
+      - "package.json"
+      - "package-lock.json"
+      - "eas.json"
+      - ".github/workflows/android-test-apk.yml"
   push:
     branches: [main]
     paths:
@@ -28,9 +44,9 @@ concurrency:
 
 jobs:
   build-debug-apk:
-    name: Build installable Android debug APK
+    name: Validate, build and cold-start test Android APK
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 55
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -58,27 +74,55 @@ jobs:
           fi
           yes | "$SDKMANAGER" --licenses || true
 
+      # This repository currently has no package-lock.json, so npm ci would fail.
+      # Keep npm install until a lockfile is generated and committed.
       - name: Install dependencies
         run: npm install --no-audit --no-fund
+
+      - name: Check Expo dependency compatibility
+        run: npx expo install --check
+
+      - name: Run Expo Doctor
+        run: npx expo-doctor
 
       - name: Validate TypeScript and tests
         run: |
           npm run typecheck
           npm test -- --passWithNoTests
 
+      - name: Export Android JavaScript bundle
+        run: npx expo export --platform android
+
       - name: Generate Android native project
         run: npx expo prebuild --platform android --no-install --non-interactive
 
-      - name: Build debug APK
+      - name: Build release APK with embedded JavaScript bundle
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew --no-daemon assembleDebug
+          ./gradlew --no-daemon assembleRelease
+
+      - name: Install and cold-start app on Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          profile: pixel_6
+          script: |
+            set -e
+            unzip -l android/app/build/outputs/apk/release/app-release.apk | grep -q "assets/index.android.bundle" || { echo "Release APK is missing assets/index.android.bundle"; exit 1; }
+            adb install -r android/app/build/outputs/apk/release/app-release.apk
+            adb logcat -c
+            adb shell monkey -p sn.maguissi.birr 1
+            sleep 20
+            if ! adb shell pidof sn.maguissi.birr >/dev/null; then echo "MAGUISSI BIRR process is not running after launch."; adb logcat -d -v threadtime -s AndroidRuntime ReactNativeJS Expo; exit 1; fi
+            if adb logcat -d -v brief -s AndroidRuntime ReactNativeJS | grep -E "FATAL EXCEPTION|Fatal signal|Unhandled JS Exception|Unable to load script|Could not connect to development server"; then echo "Crash signature detected in Android logs."; adb logcat -d -v threadtime -s AndroidRuntime ReactNativeJS Expo; exit 1; fi
+            echo "Cold-start smoke test passed: process remains alive and no fatal signature was found."
 
       - name: Upload installable APK
         uses: actions/upload-artifact@v4
         with:
-          name: maguissi-birr-android-debug-${{ github.sha }}
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: maguissi-birr-android-release-${{ github.sha }}
+          path: android/app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
           retention-days: 14
