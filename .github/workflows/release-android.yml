@@ -1,4 +1,4 @@
-name: MAGUISSI BIRR — Release Android
+name: MAGUISSI BIRR — Stable Android Release
 
 on:
   push:
@@ -90,11 +90,11 @@ jobs:
             if adb logcat -d -v brief -s AndroidRuntime ReactNativeJS | grep -E "FATAL EXCEPTION|Fatal signal|Unhandled JS Exception|Unable to load script|Could not connect to development server"; then echo "App startup error detected."; adb logcat -d -v threadtime -s AndroidRuntime ReactNativeJS Expo; exit 1; fi
             echo "Release APK cold-start test passed."
 
-      - name: Publish APK as a public GitHub Release
+      - name: Publish stable APK as a public GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.1.0
-          name: MAGUISSI BIRR Android v1.1.0
+          tag_name: v1.0.0
+          name: MAGUISSI BIRR Android v1.0.0
           target_commitish: main
           generate_release_notes: true
           files: android/app/build/outputs/apk/release/app-release.apk
