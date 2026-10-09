@@ -24,6 +24,7 @@ export default function HomeScreen() {
     <Text style={styles.sectionTitle}>Que souhaitez-vous faire ?</Text>
     <ActionCard icon="location-outline" title="Suivre un signalement" detail="Consultez votre historique et les statuts enregistrés" onPress={() => router.push('/reports')} />
     <ActionCard icon="leaf-outline" title="Conseils environnementaux" detail="Des gestes concrets pour prévenir les risques" onPress={() => router.push('/tips')} />
+    <ActionCard icon="call-outline" title="Contacter SES" detail="Appeler M. Diallo, écrire à SES ou découvrir ses services QHSE" onPress={() => router.push('/contact')} />
     <View style={styles.notice}><View style={styles.noticeHeading}><Ionicons name="shield-checkmark-outline" size={20} color="#715314" /><Text style={styles.noticeTitle}>Votre sécurité d’abord</Text></View><Text style={styles.noticeBody}>Ne vous exposez jamais à un danger pour recueillir des preuves. En cas d’urgence, contactez directement les services compétents.</Text></View>
     <Text style={styles.footer}>MAGUISSI BIRR · Signaler. Suivre. Agir.</Text>
   </ScrollView>;
