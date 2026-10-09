@@ -8,10 +8,11 @@ import { listReports, saveReport } from '@/services/reportStore';
 import type { Report, ReportStatus } from '@/types/report';
 import { statusLabel } from '@/utils/reportValidation';
 
-type QueueFilter = 'all' | 'open' | 'progress' | 'resolved';
+type QueueFilter = 'all' | 'open' | 'progress' | 'resolved' | 'priority';
 const FILTERS: { id: QueueFilter; label: string }[] = [
   { id: 'all', label: 'Tous' }, { id: 'open', label: 'À traiter' },
-  { id: 'progress', label: 'En cours' }, { id: 'resolved', label: 'Résolus' }
+  { id: 'progress', label: 'En cours' }, { id: 'resolved', label: 'Résolus' },
+  { id: 'priority', label: 'Prioritaires' }
 ];
 const ACTIONS: { status: ReportStatus; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
   { status: 'QUALIFICATION', label: 'À qualifier', icon: 'search-outline' },
@@ -53,7 +54,7 @@ export default function OperationsScreen() {
   const visible = useMemo(() => {
     const q = query.trim().toLocaleLowerCase('fr');
     return reports.filter((r) => {
-      const statusMatch = filter === 'all' || (filter === 'open' && !DONE.includes(r.status) && !ACTIVE.includes(r.status)) || (filter === 'progress' && ACTIVE.includes(r.status)) || (filter === 'resolved' && ['RESOLVED', 'CLOSED'].includes(r.status));
+      const statusMatch = filter === 'all' || (filter === 'open' && !DONE.includes(r.status) && !ACTIVE.includes(r.status)) || (filter === 'progress' && ACTIVE.includes(r.status)) || (filter === 'resolved' && ['RESOLVED', 'CLOSED'].includes(r.status)) || (filter === 'priority' && isPriority(r) && !DONE.includes(r.status));
       const category = REPORT_CATEGORIES.find((item) => item.id === r.categoryId)?.label ?? '';
       const searchMatch = !q || [r.reference, r.description, r.region, r.locality ?? '', category].some((value) => value.toLocaleLowerCase('fr').includes(q));
       return statusMatch && searchMatch;
