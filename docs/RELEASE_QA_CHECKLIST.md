@@ -12,6 +12,7 @@ Le workflow [Android test APK, run 38010274393](https://github.com/vjr221/maguis
 - [x] APK release construit avec le bundle embarqué (pas de serveur de développement requis ; run 38010274393).
 - [x] APK installé sur émulateur Android et démarrage à froid sans crash détecté (run 38010274393).
 - [ ] Installer l’APK sur un téléphone Android réel et vérifier l’ouverture à froid.
+- [ ] Tester la mise à jour depuis la version précédente avec des signalements locaux préexistants (non-régression du crash déjà corrigé).
 - [ ] Navigation par les cinq onglets, retour Android, clavier et zones sûres vérifiés.
 - [ ] Permissions demandées uniquement au moment nécessaire et refus sans blocage de l’application.
 
@@ -24,6 +25,7 @@ Le workflow [Android test APK, run 38010274393](https://github.com/vjr221/maguis
 - [ ] Vérifier que la génération d’identifiant/référence retente une collision et affiche une erreur sûre si les tentatives sont épuisées.
 - [ ] Rechercher, filtrer et ouvrir les signalements ; modifier le statut et vérifier l’historique.
 - [ ] Vérifier qu’une erreur de lecture ne se transforme pas en liste vide et n’écrase pas les données.
+- [ ] Vérifier qu’une clé absente produit une liste vide, tandis qu’une chaîne de stockage vide est sauvegardée comme donnée malformée dans la copie de récupération.
 - [ ] Exporter une sauvegarde JSON ; confirmer que les photos ne sont pas incluses et que l’avertissement sur les lieux/GPS est affiché.
 - [ ] Restaurer une sauvegarde dans une installation de test ; confirmer l’ajout des nouveaux dossiers, le rejet des fichiers invalides et la conservation des dossiers existants.
 - [ ] Tester les doublons par identifiant et référence.
