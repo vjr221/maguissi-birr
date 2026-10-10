@@ -54,6 +54,27 @@ describe('reportStore', () => {
     expect(storage.setItem).toHaveBeenCalledWith('maguissi-birr:reports:recovery-backup:v1', '');
   });
 
+  it('keeps an existing recovery snapshot and clearly reports when current raw data differs', async () => {
+    const oldSnapshot = '{older-damaged-data';
+    const currentRaw = '{newer-damaged-data';
+    storage.getItem.mockImplementation(async (key) => {
+      if (key === 'maguissi-birr:reports:v1') return currentRaw;
+      if (key === 'maguissi-birr:reports:recovery-backup:v1') return oldSnapshot;
+      return null;
+    });
+
+    await expect(listReports()).rejects.toThrow('les données illisibles actuelles n’ont pas été copiées');
+    expect(storage.setItem).not.toHaveBeenCalled();
+  });
+
+  it('explains when the recovery snapshot cannot be written', async () => {
+    storage.getItem.mockImplementation(async (key) => key === 'maguissi-birr:reports:v1' ? '{broken' : null);
+    storage.setItem.mockRejectedValueOnce(new Error('storage full'));
+
+    await expect(listReports()).rejects.toThrow('la copie de secours n’a pas pu être enregistrée');
+    expect(storage.setItem).toHaveBeenCalledWith('maguissi-birr:reports:recovery-backup:v1', '{broken');
+  });
+
   it('does not overwrite the original data when a save finds invalid records', async () => {
     const invalid = JSON.stringify([{ invalid: true }]);
     storage.getItem.mockImplementation(async (key) => key === 'maguissi-birr:reports:v1' ? invalid : null);
