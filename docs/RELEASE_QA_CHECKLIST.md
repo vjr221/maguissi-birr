@@ -2,12 +2,16 @@
 
 Cette checklist complète les contrôles automatisés. Elle ne remplace pas un essai sur un téléphone Android réel ni la validation des procédures QHSE par les personnes responsables.
 
+### Résultat automatisé vérifié — 10 octobre 2026
+Le workflow [Android test APK, run 38010274393](https://github.com/vjr221/maguissi-birr/actions/runs/38010274393) a réussi sur le commit `4090d9c5d14e5c2c4a2ffe66ddb34b3811afc74c` : TypeScript et tests unitaires, Expo Doctor, compatibilité des dépendances, bundle Android, génération native, build APK release et démarrage à froid sur émulateur. L’APK de test a été archivé comme artefact GitHub (valide jusqu’au 24 octobre 2026). SHA-256 de l’APK : `8a8fdb58420d9a43a3e4b8e3abb493849a1a16488b9bf5cc3252570d9f4eec60`. Le code applicatif de `main` n’a pas changé depuis ce commit ; les commits suivants sont documentaires. Ce résultat ne remplace pas les essais sur téléphone réel et ne constitue pas une nouvelle release publique.
+
 ## 1. Build et qualité logicielle
-- [ ] CI : vérification TypeScript et tests unitaires réussis.
-- [ ] Expo Doctor et vérification de compatibilité des dépendances réussis.
-- [ ] Bundle JavaScript Android exporté sans erreur.
-- [ ] APK release construit avec le bundle embarqué (pas de serveur de développement requis).
-- [ ] APK installé sur émulateur et téléphone réel ; ouverture à froid sans crash.
+- [x] CI : vérification TypeScript et tests unitaires réussis (run 38010274393).
+- [x] Expo Doctor et vérification de compatibilité des dépendances réussis (run 38010274393).
+- [x] Bundle JavaScript Android exporté sans erreur (run 38010274393).
+- [x] APK release construit avec le bundle embarqué (pas de serveur de développement requis ; run 38010274393).
+- [x] APK installé sur émulateur Android et démarrage à froid sans crash détecté (run 38010274393).
+- [ ] Installer l’APK sur un téléphone Android réel et vérifier l’ouverture à froid.
 - [ ] Navigation par les cinq onglets, retour Android, clavier et zones sûres vérifiés.
 - [ ] Permissions demandées uniquement au moment nécessaire et refus sans blocage de l’application.
 
