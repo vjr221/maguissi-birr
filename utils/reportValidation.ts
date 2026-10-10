@@ -24,6 +24,7 @@ export function isValidReport(value: unknown): value is Report {
     && typeof item.categoryId === 'string'
     && REPORT_CATEGORIES.some((category) => category.id === item.categoryId)
     && typeof item.description === 'string'
+    && (item.dangerImmediate === undefined || typeof item.dangerImmediate === 'boolean')
     && item.description.trim().length >= 12
     && item.description.length <= 2000
     && typeof item.region === 'string'
