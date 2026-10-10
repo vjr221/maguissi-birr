@@ -55,6 +55,10 @@ export async function saveReport(report: Report): Promise<void> {
   // listReports throws if existing data is malformed, preventing a new save
   // from silently replacing and losing the previous local records.
   const current = await listReports();
+  const idOwner = current.find((item) => item.id === report.id && item.reference !== report.reference);
+  if (idOwner) {
+    throw new Error('Cet identifiant est déjà associé à un autre signalement. Aucun dossier n’a été modifié.');
+  }
   const referenceOwner = current.find((item) => item.reference === report.reference && item.id !== report.id);
   if (referenceOwner) {
     throw new Error('Cette référence est déjà associée à un autre signalement. Aucun dossier n’a été modifié.');
