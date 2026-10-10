@@ -37,6 +37,11 @@ describe('isValidReport', () => {
     expect(isValidReport(null)).toBe(false);
     expect(isValidReport({ ...validReport, createdAt: 'not-a-date' })).toBe(false);
   });
+  it('accepts legacy reports without the new flag but rejects malformed immediate-danger values', () => {
+    expect(isValidReport(validReport)).toBe(true);
+    expect(isValidReport({ ...validReport, dangerImmediate: true })).toBe(true);
+    expect(isValidReport({ ...validReport, dangerImmediate: 'yes' })).toBe(false);
+  });
   it('rejects unsafe coordinates, too many photos, and malformed event history', () => {
     expect(isValidReport({ ...validReport, latitude: 91, longitude: 2 })).toBe(false);
     expect(isValidReport({ ...validReport, latitude: 14 })).toBe(false);
