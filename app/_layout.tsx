@@ -35,6 +35,7 @@ export default function RootLayout() {
           title: 'Accueil',
           headerShown: false,
           tabBarLabel: 'Accueil',
+          tabBarAccessibilityLabel: 'Accueil, écran principal',
           tabBarIcon: ({ color, size }) => <Ionicons name="home" color={color} size={size} />
         }}
       />
@@ -43,6 +44,7 @@ export default function RootLayout() {
         options={{
           title: 'Mes signalements',
           tabBarLabel: 'Signalements',
+          tabBarAccessibilityLabel: 'Mes signalements enregistrés sur cet appareil',
           tabBarIcon: ({ color, size }) => <Ionicons name="document-text-outline" color={color} size={size} />
         }}
       />
@@ -51,6 +53,7 @@ export default function RootLayout() {
         options={{
           title: 'Nouveau signalement',
           tabBarLabel: 'Signaler',
+          tabBarAccessibilityLabel: 'Créer un nouveau signalement',
           tabBarIcon: () => <View style={{ width: 46, height: 46, borderRadius: 23, backgroundColor: theme.colors.gold, borderWidth: 4, borderColor: theme.colors.white, alignItems: "center", justifyContent: "center", marginTop: -19, elevation: 5 }}><Ionicons name="add" color={theme.colors.ink} size={27} /></View>
         }}
       />
@@ -59,6 +62,7 @@ export default function RootLayout() {
         options={{
           title: 'Checklist prévention QHSE',
           tabBarLabel: 'Prévention',
+          tabBarAccessibilityLabel: 'Checklist de prévention qualité, hygiène, sécurité et environnement',
           tabBarIcon: ({ color, size }) => <Ionicons name="shield-checkmark-outline" color={color} size={size} />
         }}
       />
@@ -67,6 +71,7 @@ export default function RootLayout() {
         options={{
           title: 'Contacter SES',
           tabBarLabel: 'Contact',
+          tabBarAccessibilityLabel: 'Contacter Sen Environnement Services',
           tabBarIcon: ({ color, size }) => <Ionicons name="call-outline" color={color} size={size} />
         }}
       />
