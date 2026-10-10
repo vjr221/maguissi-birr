@@ -5,73 +5,36 @@ Dépôt de référence : `vjr221/maguissi-birr`
 Branche de travail : `main`  
 Identité : projet indépendant de VJR 221.
 
-## État à reprendre lors de la prochaine session
+## Audit de l’avancement et des priorités — 10 octobre 2026
 
-- Derniers changements : `8ce34549b0059fdb1376bf3981f80ac175e91674` (refus d’un identifiant déjà attribué à un autre dossier), `21282af41e93719f201507573c21cb7d9cfefc57` (test de non-écrasement), puis `a2fec1e2e0084fbc7481fc8bc27c2ff3d06aba66`, `4d6e294df91e18f9431a1b4a7466f4ed7e3da473` et `14807ef69572a3420eb5dd11dff867d6eadd1948` (génération collision-safe et tests). Le formulaire relit les dossiers avant de copier les photos.
-- Changements de sauvegarde précédents : `71fff68843d7fec489d3d7fc6b82d568cf449b2c` (rejet des identifiants/références en double à l’export/import) et `ce08abf86696691bddd89f3e627d6f9722202a35` (tests de sauvegarde).
-- Changements applicatifs précédents : `49be8067ff5866a90c90879d8a2eb436d8a61879` (accessibilité du formulaire) et `5ad75448e44a544466a33f75234afb664b5ebff1` (libellés de navigation).
-- Les changements sont écrits sur `main`. **La CI pour les commits récents n’a pas été confirmée** : le connecteur GitHub disponible permet de consulter les tâches d’un run connu, mais ne fournit pas ici la liste des derniers runs push. Ne pas assimiler cette limite d’observation à un succès ou à un échec CI.
-- Le workflow CI de `.github/workflows/ci.yml` exécute `npm install --no-audit --no-fund`, `npm run typecheck` et `npm test -- --ci`.
-- Dernière validation Android entièrement documentée : workflow [Android test APK #38010274393](https://github.com/vjr221/maguissi-birr/actions/runs/38010274393), sur le commit `4090d9c5d14e5c2c4a2ffe66ddb34b3811afc74c`. Elle a validé TypeScript, tests, Expo Doctor, compatibilité des dépendances, bundle, génération native, build APK et démarrage à froid sur émulateur. Ce résultat antérieur ne valide pas automatiquement les derniers changements.
-- Version déclarée dans `package.json` et `app.json` : `1.0.1`. Ne pas publier de release finale sur la seule base du build de test.
+Comparaison du plan et de la feuille de route avec le code présent sur `main` :
 
-## Changements récents
+- **Déjà présent** : formulaire local, 11 catégories, 14 régions, GPS facultatif, caméra/galerie, persistance et ré-encodage des photos, historique avec recherche/filtrage, partage manuel, export JSON et restauration additive.
+- **Déjà renforcé** : validation des sauvegardes, exclusion des URI de photos des sauvegardes, détection des données locales invalides, copie de récupération, protection contre les identifiants/références dupliqués et génération d’identifiants sans collision connue.
+- **À confirmer avant bêta** : CI des commits récents, essais sur Android réel, permissions acceptées/refusées, persistance après redémarrage, erreurs de stockage, sauvegarde/restauration réelle et TalkBack.
+- **Reporté** : API et base serveur, synchronisation, comptes, notifications, affectation, console professionnelle, cartographie opérationnelle et enrichissements non bloquants. Ces tâches dépendent d’une décision opérationnelle de SES et ne doivent pas détourner l’effort des validations du MVP.
+- Les documents `WORKPLAN.md` et `ROADMAP.md` ont été réalignés sur cet état pour ne pas recréer les fonctionnalités déjà présentes.
 
-### Protection contre les collisions d’identifiants — commits `8ce3454` et `21282af`
-- `saveReport` refuse désormais un identifiant déjà lié à une référence différente, au lieu de remplacer implicitement le dossier existant.
-- Un test dédié vérifie qu’aucune écriture de stockage n’est faite en cas de conflit d’identifiant.
-- La génération préalable vérifie aussi les identifiants et références déjà présents. Résultats CI de ces commits toujours non confirmés.
+## État des validations
 
-### Génération d’identifiants locaux — commits `a2fec1e`, `4d6e294` et `14807ef`
-- Ajout de `utils/reportIdentity.ts` pour générer un identifiant et une référence locale en vérifiant les dossiers déjà enregistrés, avec tentatives bornées et erreur explicite si aucune combinaison n’est disponible.
-- Le formulaire vérifie maintenant l’intégrité/lisibilité des dossiers avant de copier les photos, puis génère une identité disponible. Cela évite des fichiers photo copiés inutilement lorsque le stockage est déjà illisible et réduit les collisions accidentelles.
-- Tests ajoutés pour la génération, la collision et l’échec sûr après plusieurs collisions. **Les tests n’ont pas encore été exécutés sur ces commits** ; la CI reste à confirmer.
+- Les changements sont écrits sur `main`.
+- **La CI des commits récents n’est pas confirmée** : le connecteur GitHub disponible dans cette session ne fournit pas ici la liste des derniers runs push. Cette limite d’observation ne signifie ni réussite ni échec.
+- Le workflow `.github/workflows/ci.yml` exécute `npm install --no-audit --no-fund`, `npm run typecheck` et `npm test -- --ci`.
+- Dernière validation Android entièrement documentée : workflow [Android test APK #38010274393](https://github.com/vjr221/maguissi-birr/actions/runs/38010274393), sur le commit `4090d9c5d14e5c2c4a2ffe66ddb34b3811afc74c`. TypeScript, tests, Expo Doctor, compatibilité des dépendances, bundle, génération native, build APK et démarrage à froid sur émulateur ont réussi sur ce commit. Cela ne valide pas automatiquement les changements postérieurs.
+- Version déclarée dans `package.json` et `app.json` : `1.0.1`. Pas de release finale sur la seule base de cet ancien build.
 
-### Intégrité du stockage local — commits `9fc9083` et `7eb8092`
-- La lecture des dossiers locaux détecte désormais les identifiants ou références dupliqués, conserve une copie brute de récupération et bloque les opérations normales au lieu de continuer avec des données ambiguës.
-- L’enregistrement refuse d’attribuer à un nouveau dossier une référence déjà utilisée par un autre dossier.
-- Les tests couvrent la sauvegarde de récupération pour des données dupliquées et le refus d’une référence conflictuelle.
-- Ces protections ne suppriment ni ne réparent automatiquement les données en conflit : elles les préservent pour investigation.
+## Derniers changements de code
 
-### Intégrité des sauvegardes — commits `71fff68` et `ce08abf`
-- L’export refuse désormais une collection qui contient des identifiants de dossier ou des références en double.
-- L’import valide le document complet puis refuse les sauvegardes ambiguës avant qu’elles puissent atteindre le processus de restauration.
-- Les tests couvrent les doublons d’identifiant et de référence à l’export comme à l’import.
-- La fusion additive conserve son comportement de sécurité : les dossiers locaux gagnent en cas de conflit et les doublons rencontrés lors d’une fusion directe sont ignorés sans écrasement.
+- `8ce34549` et `21282af` : refus d’un identifiant déjà lié à une autre référence et test vérifiant qu’aucune écriture n’a lieu en cas de conflit.
+- `a2fec1e`, `4d6e294` et `14807ef` : génération d’identifiants/références locales avec vérification des dossiers existants, tentatives bornées et tests de collision.
+- `9fc9083` et `7eb8092` : conservation d’une copie brute de récupération et blocage des opérations normales si le stockage local est malformé ou contient des identités dupliquées.
+- `71fff688` et `ce08abf` : contrôles d’intégrité à l’export/import des sauvegardes et tests.
+- `5ad7544` et `49be806` : libellés d’accessibilité pour la navigation et le formulaire.
 
-### Accessibilité de la navigation — commit `5ad7544`
-Ajout de libellés explicites aux onglets Accueil, Signalements, Signaler, Prévention et Contact dans `app/_layout.tsx`.
+## Règles permanentes
 
-### Accessibilité du formulaire — commit `49be806`
-Dans `app/new-report.tsx` :
-- les boutons de catégorie et de région exposent leur libellé et leur état sélectionné ;
-- les actions caméra et galerie ont des libellés plus explicites, la galerie annonçant le nombre de photos jointes ;
-- le bouton d’enregistrement expose son état désactivé/en cours et une annonce explicite de l’action.
-
-Ces changements nécessitent encore les vérifications TypeScript/tests via CI et une vérification avec un lecteur d’écran sur appareil réel.
-
-## Éléments de fiabilité déjà présents
-
-- Les signalements sont stockés localement avec AsyncStorage ; aucune API serveur ne reçoit les dossiers.
-- Une référence locale n’est pas un numéro officiel et ne doit pas être présentée comme une preuve de transmission.
-- Si les données locales sont malformées, le stockage conserve une copie de récupération et refuse de remplacer silencieusement les dossiers.
-- La restauration d’une sauvegarde est additive : les dossiers existants gagnent en cas de conflit et les médias/URI locaux ne sont pas importés depuis une autre installation.
-- Les métadonnées de sauvegarde sont validées ; les tests couvrent les fichiers malformés, les conflits et les identifiants/références dupliqués à l’import/export comme dans le stockage local.
-
-## Prochaines actions, dans l’ordre
-
-1. Confirmer le résultat CI des derniers commits depuis GitHub Actions ou en déclenchant un run contrôlé ; corriger tout échec TypeScript ou Jest.
-2. Lire les journaux de tests et ne déclarer aucun contrôle réussi sans résultat observé.
-3. Confirmer la CI après les changements de génération et de protection contre les collisions, puis auditer les chemins de restauration/export de sauvegarde dans l’interface et vérifier qu’une erreur affiche un message compréhensible sans toucher aux dossiers locaux.
-4. Vérifier l’accessibilité du formulaire et des cinq onglets avec TalkBack sur Android réel.
-5. Exécuter la checklist de validation : permissions GPS/caméra, refus de permissions, photos après redémarrage, stockage insuffisant, recherche/historique, navigation et démarrage à froid.
-6. Valider la notice de confidentialité, les responsabilités QHSE et les conditions d’utilisation avant toute bêta publique.
-7. Ne préparer la release finale qu’après les contrôles automatisés et les tests sur appareil réel.
-
-## Contraintes permanentes du projet
-
-- Continuer les modifications sur `main`, comme demandé.
+- Continuer sur `main), comme demandé.
 - Garder MAGUISSI BIRR distinct de VJR 221.
-- Ne jamais supprimer ni remplacer les données de signalement silencieusement.
+- Ne jamais supprimer ni remplacer silencieusement les données de signalement.
 - Ne pas inventer de résultats de test, de transmissions serveur ou de statuts de dossier.
-- Ne pas publier de release finale tant que les validations restantes ne sont pas terminées.
+- Ne pas publier de release finale avant validation des contrôles automatisés, essais sur téléphone réel et exigences opérationnelles.
