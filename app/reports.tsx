@@ -20,8 +20,7 @@ export default function ReportsScreen() {
   useFocusEffect(useCallback(() => {
     let active = true;
     setLoading(true);
-    setLoadError(null);
-    listReports().then((items) => { if (active) setReports(items); })
+    listReports().then((items) => { if (active) { setReports(items); setLoadError(null); } })
       .catch((error: unknown) => {
         if (active) {
           const message = error instanceof Error ? error.message : 'Les signalements enregistrés sur cet appareil n’ont pas pu être lus.';
@@ -34,8 +33,8 @@ export default function ReportsScreen() {
   }, []));
 
   const exportBackup = async () => {
-    if (loadError) {
-      Alert.alert('Sauvegarde indisponible', 'Les données locales ne peuvent pas être lues correctement. Ne créez pas une sauvegarde vide ; conservez les données et la copie de secours pour diagnostic.');
+    if (loading || loadError) {
+      Alert.alert('Sauvegarde indisponible', loading ? 'La lecture des données est en cours. Réessayez lorsque le chargement est terminé.' : 'Les données locales ne peuvent pas être lues correctement. Ne créez pas une sauvegarde vide ; conservez les données et la copie de secours pour diagnostic.');
       return;
     }
     if (reports.length === 0) {
@@ -64,8 +63,8 @@ export default function ReportsScreen() {
   };
 
   const importBackup = async () => {
-    if (loadError) {
-      Alert.alert('Restauration suspendue', 'Les données locales actuelles ne sont pas lisibles. Aucune restauration ne sera tentée afin de protéger les données existantes.');
+    if (loading || loadError) {
+      Alert.alert('Restauration suspendue', loading ? 'La lecture des données est en cours. Réessayez lorsque le chargement est terminé.' : 'Les données locales actuelles ne sont pas lisibles. Aucune restauration ne sera tentée afin de protéger les données existantes.');
       return;
     }
     Alert.alert(

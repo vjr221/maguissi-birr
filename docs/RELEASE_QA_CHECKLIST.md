@@ -62,3 +62,5 @@ Le workflow [Android test APK, run 38010274393](https://github.com/vjr221/maguis
 
 ## Critères de publication
 La publication stable exige que les contrôles automatisés et le test de démarrage Android passent. Les contrôles manuels doivent être réalisés sur un appareil réel avant diffusion large. Tant qu’une API n’est pas déployée et configurée, l’application doit continuer à indiquer clairement que les signalements restent sur l’appareil et qu’aucune équipe n’est notifiée automatiquement.
+
+- [ ] Pendant une nouvelle tentative de lecture, vérifier que l’état d’erreur reste protecteur jusqu’à ce qu’une lecture réussie confirme que les données sont accessibles ; ne pas permettre export, import ou modification pendant le chargement.

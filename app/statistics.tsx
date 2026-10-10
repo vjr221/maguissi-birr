@@ -23,7 +23,7 @@ export default function StatisticsScreen() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [period, setPeriod] = useState<Period>('all');
-  useFocusEffect(useCallback(() => { let active = true; setLoading(true); setLoadError(null); listReports().then(items => { if (active) setReports(items); }).catch((error: unknown) => { if (active) { const message = error instanceof Error ? error.message : 'Les données locales ne peuvent pas être lues.'; setLoadError(message); Alert.alert('Statistiques indisponibles', message); } }).finally(() => { if (active) setLoading(false); }); return () => { active = false; }; }, []));
+  useFocusEffect(useCallback(() => { let active = true; setLoading(true); listReports().then(items => { if (active) { setReports(items); setLoadError(null); } }).catch((error: unknown) => { if (active) { const message = error instanceof Error ? error.message : 'Les données locales ne peuvent pas être lues.'; setLoadError(message); Alert.alert('Statistiques indisponibles', message); } }).finally(() => { if (active) setLoading(false); }); return () => { active = false; }; }, []));
   const filtered = useMemo(() => {
     if (period === 'all') return reports;
     const cutoff = Date.now() - Number(period) * 24 * 60 * 60 * 1000;

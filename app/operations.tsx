@@ -37,8 +37,11 @@ export default function OperationsScreen() {
   const [expandedIds, setExpandedIds] = useState<string[]>([]);
   const refresh = useCallback(async () => {
     setLoading(true);
-    setLoadError(null);
-    try { setReports(await listReports()); }
+    try {
+      const items = await listReports();
+      setReports(items);
+      setLoadError(null);
+    }
     catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Les signalements locaux n’ont pas pu être lus.';
       setLoadError(message);
@@ -48,9 +51,8 @@ export default function OperationsScreen() {
   useFocusEffect(useCallback(() => {
     let active = true;
     setLoading(true);
-    setLoadError(null);
     listReports()
-      .then((items) => { if (active) setReports(items); })
+      .then((items) => { if (active) { setReports(items); setLoadError(null); } })
       .catch((error: unknown) => {
         if (active) {
           const message = error instanceof Error ? error.message : 'Les signalements enregistrés sur cet appareil n’ont pas pu être lus. Aucun dossier ne sera remplacé automatiquement.';
@@ -78,7 +80,7 @@ export default function OperationsScreen() {
     }).sort((a, b) => Number(isPriorityReport(b)) - Number(isPriorityReport(a)) || Date.parse(b.createdAt) - Date.parse(a.createdAt));
   }, [reports, filter, query]);
   const changeStatus = async (report: Report, status: ReportStatus) => {
-    if (savingId) return;
+    if (savingId || loading || loadError) return;
     setSavingId(report.id);
     const at = new Date().toISOString();
     const updated: Report = { ...report, status, events: [...report.events, { status, at, note: `Suivi personnel local : ${statusLabel(status)}` }] };
@@ -105,7 +107,7 @@ export default function OperationsScreen() {
     <View style={styles.hero}>
       <View style={styles.heroTop}><View style={styles.heroIcon}><Ionicons name="clipboard-outline" size={24} color={theme.colors.forest} /></View><View style={{ flex: 1 }}><Text style={styles.eyebrow}>MAGUISSI BIRR · QHSE</Text><Text style={styles.heroTitle}>Suivi personnel</Text></View><Pressable accessibilityRole="button" accessibilityLabel="Actualiser" onPress={refresh} style={styles.refresh}><Ionicons name="refresh-outline" size={20} color={theme.colors.white} /></Pressable></View>
       <Text style={styles.heroBody}>Un espace personnel pour consulter vos dossiers et noter votre suivi sur cet appareil. Les changements ne sont ni des affectations officielles ni des résolutions validées par une équipe.</Text>
-      {!loadError && <View style={styles.metrics}><Metric value={counts.total} label="Total" /><Metric value={counts.open} label="À traiter" tone="amber" /><Metric value={counts.progress} label="En cours" /><Metric value={counts.priority} label="Prioritaires" tone="red" /></View>}
+      {!loadError && !loading && <View style={styles.metrics}><Metric value={counts.total} label="Total" /><Metric value={counts.open} label="À traiter" tone="amber" /><Metric value={counts.progress} label="En cours" /><Metric value={counts.priority} label="Prioritaires" tone="red" /></View>}
     </View>
     {loadError && !loading && <View style={styles.errorCard}><Ionicons name="alert-circle-outline" size={30} color={theme.colors.danger} /><Text style={styles.emptyTitle}>Dossiers indisponibles</Text><Text style={styles.emptyText}>Le stockage local n’a pas pu être lu. Les compteurs et la file sont masqués pour éviter de présenter des zéros trompeurs. Aucune modification ne doit être tentée tant que les données ne sont pas accessibles.</Text><Text style={styles.errorDetails}>{loadError}</Text><Pressable accessibilityRole="button" onPress={() => { void refresh(); }} style={styles.retryButton}><Ionicons name="refresh-outline" size={16} color={theme.colors.white} /><Text style={styles.retryText}>Réessayer la lecture</Text></Pressable><Text style={styles.emptyText}>Ne désinstallez pas l’application et conservez la copie de récupération pour diagnostic.</Text></View>}
     <View style={styles.localNotice}><Ionicons name="phone-portrait-outline" size={18} color="#715314" /><Text style={styles.localNoticeText}>Mode local : les dossiers et changements de statut restent sur cet appareil. Aucune équipe distante n’est notifiée et aucune affectation réelle n’est envoyée.</Text></View>

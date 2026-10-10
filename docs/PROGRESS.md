@@ -48,3 +48,5 @@ Comparaison du plan et de la feuille de route avec le code présent sur `main` :
 - `6d93fc6e` : l’écran Statistiques distingue désormais une erreur de lecture des données d’un véritable total à zéro ; les indicateurs ne sont pas affichés lorsque les données locales sont illisibles.
 
 - `7e7dddec` : le Centre d’opérations masque désormais ses compteurs et sa file quand le stockage local est illisible, bloque les changements de statut et propose de réessayer. Le test manuel correspondant est ajouté à la checklist QA ; la validation CI de ce changement reste en cours.
+
+- Le nouvel essai de lecture conserve maintenant l’état d’erreur jusqu’à réussite confirmée ; les opérations d’export/restauration sont suspendues pendant le chargement, et les métriques d’opérations restent masquées pendant ce temps. Validation CI/build Android à relancer après ce changement.
