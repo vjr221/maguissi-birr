@@ -7,6 +7,7 @@ import { theme } from '@/constants/theme';
 import { listReports, saveReport } from '@/services/reportStore';
 import type { Report, ReportStatus } from '@/types/report';
 import { statusLabel } from '@/utils/reportValidation';
+import { isPriorityReport } from '@/utils/reportPriority';
 
 type QueueFilter = 'all' | 'open' | 'progress' | 'resolved' | 'priority';
 const FILTERS: { id: QueueFilter; label: string }[] = [
@@ -23,9 +24,6 @@ const ACTIONS: { status: ReportStatus; label: string; icon: keyof typeof Ionicon
 ];
 const DONE: ReportStatus[] = ['RESOLVED', 'CLOSED', 'REJECTED', 'DUPLICATE'];
 const ACTIVE: ReportStatus[] = ['ASSIGNED', 'IN_PROGRESS'];
-function isPriority(report: Report): boolean {
-  return report.dangerImmediate === true;
-}
 function Metric({ value, label, tone = 'green' }: { value: number; label: string; tone?: 'green' | 'amber' | 'red' }) {
   return <View style={styles.metric}><Text style={[styles.metricValue, tone === 'red' && { color: theme.colors.danger }, tone === 'amber' && { color: '#946713' }]}>{value}</Text><Text style={styles.metricLabel}>{label}</Text></View>;
 }
@@ -53,11 +51,11 @@ export default function OperationsScreen() {
   const visible = useMemo(() => {
     const q = query.trim().toLocaleLowerCase('fr');
     return reports.filter((r) => {
-      const statusMatch = filter === 'all' || (filter === 'open' && !DONE.includes(r.status) && !ACTIVE.includes(r.status)) || (filter === 'progress' && ACTIVE.includes(r.status)) || (filter === 'resolved' && ['RESOLVED', 'CLOSED'].includes(r.status)) || (filter === 'priority' && isPriority(r) && !DONE.includes(r.status));
+      const statusMatch = filter === 'all' || (filter === 'open' && !DONE.includes(r.status) && !ACTIVE.includes(r.status)) || (filter === 'progress' && ACTIVE.includes(r.status)) || (filter === 'resolved' && ['RESOLVED', 'CLOSED'].includes(r.status)) || (filter === 'priority' && isPriorityReport(r) && !DONE.includes(r.status));
       const category = REPORT_CATEGORIES.find((item) => item.id === r.categoryId)?.label ?? '';
       const searchMatch = !q || [r.reference, r.description, r.region, r.locality ?? '', category].some((value) => value.toLocaleLowerCase('fr').includes(q));
       return statusMatch && searchMatch;
-    }).sort((a, b) => Number(isPriority(b)) - Number(isPriority(a)) || Date.parse(b.createdAt) - Date.parse(a.createdAt));
+    }).sort((a, b) => Number(isPriorityReport(b)) - Number(isPriorityReport(a)) || Date.parse(b.createdAt) - Date.parse(a.createdAt));
   }, [reports, filter, query]);
   const changeStatus = async (report: Report, status: ReportStatus) => {
     if (savingId) return;
@@ -94,7 +92,7 @@ export default function OperationsScreen() {
     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filters}>{FILTERS.map((item) => <Pressable key={item.id} accessibilityRole="button" accessibilityState={{ selected: filter === item.id }} onPress={() => setFilter(item.id)} style={[styles.filter, filter === item.id && styles.filterActive]}><Text style={[styles.filterText, filter === item.id && styles.filterTextActive]}>{item.label}</Text></Pressable>)}</ScrollView>
     {loading ? <Text style={styles.empty}>Chargement des dossiers…</Text> : visible.length === 0 ? <View style={styles.emptyCard}><Ionicons name="file-tray-outline" size={32} color={theme.colors.muted} /><Text style={styles.emptyTitle}>Aucun dossier dans cette vue</Text><Text style={styles.emptyText}>Créez un signalement ou changez le filtre pour afficher les autres dossiers.</Text></View> : visible.map((report) => {
       const category = REPORT_CATEGORIES.find((item) => item.id === report.categoryId)?.label ?? 'Autre situation';
-      const priority = isPriority(report);
+      const priority = isPriorityReport(report);
       const busy = savingId === report.id;
       return <View key={report.id} style={styles.reportCard}>
         <View style={styles.reportTop}><Text style={styles.reference}>{report.reference}</Text>{priority && <View style={styles.priorityBadge}><Ionicons name="alert-circle" size={13} color={theme.colors.danger} /><Text style={styles.priorityText}>Priorité à vérifier</Text></View>}</View>
