@@ -12,7 +12,7 @@ Comparaison du plan et de la feuille de route avec le code présent sur `main` :
 - **Déjà présent** : formulaire local, 11 catégories, 14 régions, GPS facultatif, caméra/galerie, persistance et ré-encodage des photos, historique avec recherche/filtrage, partage manuel, export JSON et restauration additive.
 - **Déjà renforcé** : validation des sauvegardes, exclusion des URI de photos des sauvegardes, détection des données locales invalides, copie de récupération, protection contre les identifiants/références dupliqués et génération d’identifiants sans collision connue. Le flux de persistance des photos a aussi été rendu séquentiel : si une photo échoue après une ou plusieurs copies réussies, les copies créées pendant cette tentative sont nettoyées au mieux, sans supprimer les URI sources déjà présentes dans le stockage permanent.
 - **À confirmer avant bêta** : CI des commits récents, essais sur Android réel, permissions acceptées/refusées, persistance après redémarrage, erreurs de stockage, sauvegarde/restauration réelle et TalkBack.
-- **Compatibilité de mise à jour à vérifier en priorité** : la version `v1.0.0` ne contient pas le champ facultatif `dangerImmediate`, et le validateur actuel autorise explicitement son absence ; les catégories et régions comparées sont inchangées. Cela ne suffit pas à identifier la cause du crash signalé après mise à jour : il faut reproduire l’upgrade sur appareil de test avec données préexistantes et relever le message exact, sans effacer les données.
+- **Crash après mise à jour** : l’utilisateur confirme le 10 octobre 2026 que ce crash est déjà corrigé. Ne pas rouvrir ce problème comme s’il était encore actif. Conserver un test de non-régression de compatibilité avec les données d’une ancienne version lors de la QA générale.
 - **Reporté** : API et base serveur, synchronisation, comptes, notifications, affectation, console professionnelle, cartographie opérationnelle et enrichissements non bloquants. Ces tâches dépendent d’une décision opérationnelle de SES et ne doivent pas détourner l’effort des validations du MVP.
 - Les documents `WORKPLAN.md` et `ROADMAP.md` ont été réalignés sur cet état pour ne pas recréer les fonctionnalités déjà présentes.
 
@@ -32,6 +32,7 @@ Comparaison du plan et de la feuille de route avec le code présent sur `main` :
 - `71fff688` et `ce08abf` : contrôles d’intégrité à l’export/import des sauvegardes et tests.
 - `5ad7544` et `49be806` : libellés d’accessibilité pour la navigation et le formulaire.
 - `df6a633`, `93eeb04` et `25463f3` : persistance séquentielle des photos et tests de nettoyage des copies partielles si une étape échoue. Ces nouveaux tests sont ajoutés au dépôt, mais leur exécution CI n’est pas encore confirmée.
+- `fcac390b` et `e9e4dfb9` : une valeur de stockage vide (`""`) n’est plus confondue avec une clé absente ; elle est conservée dans la copie de récupération et signalée comme donnée malformée.
 
 ## Règles permanentes
 
@@ -39,4 +40,5 @@ Comparaison du plan et de la feuille de route avec le code présent sur `main` :
 - Garder MAGUISSI BIRR distinct de VJR 221.
 - Ne jamais supprimer ni remplacer silencieusement les données de signalement.
 - Ne pas inventer de résultats de test, de transmissions serveur ou de statuts de dossier.
+- Le crash de mise à jour signalé précédemment est corrigé selon la confirmation de l’utilisateur ; se concentrer sur la non-régression, pas sur une investigation déjà résolue.
 - Ne pas publier de release finale avant validation des contrôles automatisés, essais sur téléphone réel et exigences opérationnelles.
