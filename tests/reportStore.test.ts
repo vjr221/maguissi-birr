@@ -47,6 +47,13 @@ describe('reportStore', () => {
     expect(storage.setItem).toHaveBeenCalledWith('maguissi-birr:reports:recovery-backup:v1', '{broken');
   });
 
+  it('preserves an empty stored string as malformed data instead of treating it as an empty store', async () => {
+    storage.getItem.mockImplementation(async (key) => key === 'maguissi-birr:reports:v1' ? '' : null);
+
+    await expect(listReports()).rejects.toThrow('copie de secours');
+    expect(storage.setItem).toHaveBeenCalledWith('maguissi-birr:reports:recovery-backup:v1', '');
+  });
+
   it('does not overwrite the original data when a save finds invalid records', async () => {
     const invalid = JSON.stringify([{ invalid: true }]);
     storage.getItem.mockImplementation(async (key) => key === 'maguissi-birr:reports:v1' ? invalid : null);
