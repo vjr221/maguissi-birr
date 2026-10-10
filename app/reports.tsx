@@ -26,6 +26,7 @@ export default function ReportsScreen() {
       'MAGUISSI BIRR — Résumé de signalement',
       `Référence locale : ${report.reference}`,
       `Catégorie : ${category}`,
+      ...(report.dangerImmediate ? ['⚠️ DANGER IMMÉDIAT signalé par l’utilisateur'] : []),
       `Lieu : ${report.region}${report.locality ? ' — ' + report.locality : ''}`,
       `Statut local : ${statusLabel(report.status)}`,
       `Date : ${new Date(report.createdAt).toLocaleString('fr-FR')}`,
@@ -51,6 +52,7 @@ export default function ReportsScreen() {
       'Je souhaite porter à votre attention le signalement suivant, enregistré localement dans MAGUISSI BIRR.',
       `Référence locale : ${report.reference}`,
       `Catégorie : ${category}`,
+      ...(report.dangerImmediate ? ['⚠️ DANGER IMMÉDIAT signalé par l’utilisateur'] : []),
       `Lieu : ${report.region}${report.locality ? ' — ' + report.locality : ''}`,
       `Statut local : ${statusLabel(report.status)}`,
       `Date de création : ${new Date(report.createdAt).toLocaleString('fr-FR')}`,
@@ -77,7 +79,7 @@ export default function ReportsScreen() {
 
   const normalizedQuery = query.trim().toLocaleLowerCase('fr');
   const filteredReports = reports.filter((report) => [
-    report.reference, report.description, report.region, report.locality ?? '',
+    report.reference, report.description, report.region, report.locality ?? '', report.dangerImmediate ? 'danger immédiat urgence priorité' : '',
     REPORT_CATEGORIES.find((category) => category.id === report.categoryId)?.label ?? ''
   ].some((value) => value.toLocaleLowerCase('fr').includes(normalizedQuery)))
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -89,6 +91,7 @@ export default function ReportsScreen() {
     {loading ? <View accessibilityRole="progressbar" style={styles.loadingCard}><Text style={styles.empty}>Chargement de vos signalements…</Text></View> : reports.length === 0 ? <View style={styles.emptyCard}><Text style={styles.emptyIcon}>🗂️</Text><Text style={styles.emptyTitle}>Aucun signalement enregistré</Text><Text style={styles.empty}>Déclarez une situation environnementale ou QHSE pour conserver une trace sur cet appareil.</Text><Pressable accessibilityRole="button" onPress={() => router.push('/new-report')} style={styles.primaryButton}><Text style={styles.primaryButtonText}>＋ Créer un signalement</Text></Pressable></View> : filteredReports.length === 0 ? <View style={styles.emptyCard}><Text style={styles.emptyTitle}>Aucun résultat</Text><Text style={styles.empty}>Essayez une autre référence, région ou expression.</Text><Pressable accessibilityRole="button" onPress={() => setQuery('')} style={styles.clearButton}><Text style={styles.clearButtonText}>Effacer la recherche</Text></Pressable></View> : <><Text style={styles.resultCount}>{filteredReports.length} signalement{filteredReports.length > 1 ? 's' : ''} {normalizedQuery ? 'trouvé' + (filteredReports.length > 1 ? 's' : '') : 'enregistré' + (filteredReports.length > 1 ? 's' : '')} · du plus récent au plus ancien</Text>{filteredReports.map((report) => <View key={report.id} style={styles.card}>
       <Text style={styles.ref}>{report.reference}</Text>
       <Text style={styles.category}>{REPORT_CATEGORIES.find((category) => category.id === report.categoryId)?.label ?? 'Autre situation'}</Text>
+      {report.dangerImmediate === true && <View accessibilityRole="text" accessibilityLabel="Danger immédiat signalé par l’utilisateur, appeler directement les secours si nécessaire" style={styles.dangerBadge}><Text style={styles.dangerBadgeText}>⚠ Danger immédiat signalé</Text></View>}
       <Text style={styles.description}>{report.description}</Text>
       <Text style={styles.meta}>{report.region}{report.locality ? ' · ' + report.locality : ''}</Text>
       <Text style={styles.status}>{statusLabel(report.status)}</Text>
@@ -106,6 +109,8 @@ const styles = StyleSheet.create({
   page: { padding: 18, gap: 12 },
   search: { backgroundColor: theme.colors.white, borderColor: theme.colors.border, borderWidth: 1, borderRadius: 13, padding: 13, color: theme.colors.ink, fontSize: 14 },
   category: { color: theme.colors.forest, fontSize: 12, fontWeight: '800' },
+  dangerBadge: { alignSelf: 'flex-start', backgroundColor: '#FFF0EE', borderColor: '#E8A8A2', borderWidth: 1, borderRadius: 9, paddingHorizontal: 10, paddingVertical: 6 },
+  dangerBadgeText: { color: '#9D2922', fontSize: 12, fontWeight: '900' },
   status: { alignSelf: 'flex-start', backgroundColor: theme.colors.mint, color: theme.colors.forest, borderRadius: 8, overflow: 'hidden', paddingHorizontal: 9, paddingVertical: 5, fontSize: 11, fontWeight: '800' },
   intro: { color: theme.colors.muted, lineHeight: 21 },
   emailNote: { color: theme.colors.forest, backgroundColor: theme.colors.mint, padding: 13, borderRadius: 12, lineHeight: 19, fontSize: 13 },
