@@ -1,5 +1,6 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { theme } from '@/constants/theme';
 
@@ -50,7 +51,7 @@ export default function RootLayout() {
         options={{
           title: 'Nouveau signalement',
           tabBarLabel: 'Signaler',
-          tabBarIcon: ({ color, size }) => <Ionicons name="add-circle" color={color} size={size} />
+          tabBarIcon: () => <View style={{ width: 46, height: 46, borderRadius: 23, backgroundColor: theme.colors.gold, borderWidth: 4, borderColor: theme.colors.white, alignItems: "center", justifyContent: "center", marginTop: -19, elevation: 5 }}><Ionicons name="add" color={theme.colors.ink} size={27} /></View>
         }}
       />
       <Tabs.Screen
