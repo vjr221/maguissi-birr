@@ -27,6 +27,8 @@ Le workflow [Android test APK, run 38010274393](https://github.com/vjr221/maguis
 - [ ] Vérifier qu’une erreur de lecture ne se transforme pas en liste vide et n’écrase pas les données.
 - [ ] Vérifier que l’écran affiche un état d’erreur explicite plutôt que « Aucun signalement enregistré » si le stockage local est illisible.
 - [ ] Vérifier qu’une clé absente produit une liste vide, tandis qu’une chaîne de stockage vide est sauvegardée comme donnée malformée dans la copie de récupération.
+- [ ] Vérifier qu’une copie de récupération préexistante différente n’est jamais écrasée et que l’interface précise que les données malformées actuelles n’ont pas été copiées.
+- [ ] Simuler un échec d’écriture de la copie de récupération et vérifier que le message n’affirme pas à tort qu’une sauvegarde a réussi.
 - [ ] Exporter une sauvegarde JSON ; confirmer que les photos ne sont pas incluses et que l’avertissement sur les lieux/GPS est affiché.
 - [ ] Restaurer une sauvegarde dans une installation de test ; confirmer l’ajout des nouveaux dossiers, le rejet des fichiers invalides et la conservation des dossiers existants.
 - [ ] Tester les doublons par identifiant et référence.
