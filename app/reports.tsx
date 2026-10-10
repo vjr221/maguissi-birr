@@ -15,16 +15,29 @@ import { createReportBackup } from '@/utils/reportBackup';
 export default function ReportsScreen() {
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   useFocusEffect(useCallback(() => {
     let active = true;
+    setLoading(true);
+    setLoadError(null);
     listReports().then((items) => { if (active) setReports(items); })
-      .catch((error: unknown) => { if (active) Alert.alert('Données locales à vérifier', error instanceof Error ? error.message : 'Les signalements enregistrés sur cet appareil n’ont pas pu être lus.'); })
+      .catch((error: unknown) => {
+        if (active) {
+          const message = error instanceof Error ? error.message : 'Les signalements enregistrés sur cet appareil n’ont pas pu être lus.';
+          setLoadError(message);
+          Alert.alert('Données locales à vérifier', message);
+        }
+      })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
   }, []));
 
   const exportBackup = async () => {
+    if (loadError) {
+      Alert.alert('Sauvegarde indisponible', 'Les données locales ne peuvent pas être lues correctement. Ne créez pas une sauvegarde vide ; conservez les données et la copie de secours pour diagnostic.');
+      return;
+    }
     if (reports.length === 0) {
       Alert.alert('Aucune donnée à sauvegarder', 'Créez d’abord un signalement.');
       return;
@@ -51,6 +64,10 @@ export default function ReportsScreen() {
   };
 
   const importBackup = async () => {
+    if (loadError) {
+      Alert.alert('Restauration suspendue', 'Les données locales actuelles ne sont pas lisibles. Aucune restauration ne sera tentée afin de protéger les données existantes.');
+      return;
+    }
     Alert.alert(
       'Restaurer une sauvegarde ?',
       'Les signalements valides seront ajoutés sans remplacer les dossiers déjà présents. Les doublons seront ignorés et les photos ne pourront pas être restaurées depuis ce fichier.',
