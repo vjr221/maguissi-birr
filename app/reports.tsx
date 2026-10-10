@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { Alert, Linking, Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View } from 'react-native';
 import { listReports } from '@/services/reportStore';
 import type { Report } from '@/types/report';
@@ -80,13 +80,14 @@ export default function ReportsScreen() {
   const filteredReports = reports.filter((report) => [
     report.reference, report.description, report.region, report.locality ?? '',
     REPORT_CATEGORIES.find((category) => category.id === report.categoryId)?.label ?? ''
-  ].some((value) => value.toLocaleLowerCase('fr').includes(normalizedQuery)));
+  ].some((value) => value.toLocaleLowerCase('fr').includes(normalizedQuery)))
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   return <ScrollView contentContainerStyle={styles.page}>
     <Text style={styles.intro}>Les signalements ci-dessous sont enregistrés sur cet appareil. Le suivi à distance sera disponible après mise en place de l'API sécurisée.</Text>
     <Text style={styles.emailNote}>Vous pouvez préparer manuellement un e-mail à SES pour transmettre un résumé. L’envoi reste sous votre contrôle et doit être confirmé dans votre messagerie.</Text>
     {!loading && reports.length > 0 && <TextInput value={query} onChangeText={setQuery} placeholder="Rechercher par référence, région ou texte…" placeholderTextColor={theme.colors.muted} style={styles.search} />}
-    {loading ? <Text style={styles.empty}>Chargement…</Text> : reports.length === 0 ? <View style={styles.emptyCard}><Text style={styles.emptyIcon}>🗂️</Text><Text style={styles.emptyTitle}>Aucun signalement enregistré</Text><Text style={styles.empty}>Vos signalements apparaîtront ici après leur enregistrement.</Text></View> : filteredReports.length === 0 ? <Text style={styles.empty}>Aucun résultat pour cette recherche.</Text> : filteredReports.map((report) => <View key={report.id} style={styles.card}>
+    {loading ? <View accessibilityRole="progressbar" style={styles.loadingCard}><Text style={styles.empty}>Chargement de vos signalements…</Text></View> : reports.length === 0 ? <View style={styles.emptyCard}><Text style={styles.emptyIcon}>🗂️</Text><Text style={styles.emptyTitle}>Aucun signalement enregistré</Text><Text style={styles.empty}>Déclarez une situation environnementale ou QHSE pour conserver une trace sur cet appareil.</Text><Pressable accessibilityRole="button" onPress={() => router.push('/new-report')} style={styles.primaryButton}><Text style={styles.primaryButtonText}>＋ Créer un signalement</Text></Pressable></View> : filteredReports.length === 0 ? <View style={styles.emptyCard}><Text style={styles.emptyTitle}>Aucun résultat</Text><Text style={styles.empty}>Essayez une autre référence, région ou expression.</Text><Pressable accessibilityRole="button" onPress={() => setQuery('')} style={styles.clearButton}><Text style={styles.clearButtonText}>Effacer la recherche</Text></Pressable></View> : <><Text style={styles.resultCount}>{filteredReports.length} signalement{filteredReports.length > 1 ? 's' : ''} {normalizedQuery ? 'trouvé' + (filteredReports.length > 1 ? 's' : '') : 'enregistré' + (filteredReports.length > 1 ? 's' : '')} · du plus récent au plus ancien</Text>{filteredReports.map((report) => <View key={report.id} style={styles.card}>
       <Text style={styles.ref}>{report.reference}</Text>
       <Text style={styles.category}>{REPORT_CATEGORIES.find((category) => category.id === report.categoryId)?.label ?? 'Autre situation'}</Text>
       <Text style={styles.description}>{report.description}</Text>
@@ -99,7 +100,7 @@ export default function ReportsScreen() {
       <Pressable accessibilityRole="button" onPress={() => shareSummary(report)} style={({ pressed }) => [styles.shareButton, pressed && { opacity: 0.8 }]}>
         <Text style={styles.shareButtonText}>Partager le résumé…</Text>
       </Pressable>
-    </View>)}
+    </View>)}</>}
   </ScrollView>;
 }
 const styles = StyleSheet.create({
@@ -109,7 +110,13 @@ const styles = StyleSheet.create({
   status: { alignSelf: 'flex-start', backgroundColor: theme.colors.mint, color: theme.colors.forest, borderRadius: 8, overflow: 'hidden', paddingHorizontal: 9, paddingVertical: 5, fontSize: 11, fontWeight: '800' },
   intro: { color: theme.colors.muted, lineHeight: 21 },
   emailNote: { color: theme.colors.forest, backgroundColor: theme.colors.mint, padding: 13, borderRadius: 12, lineHeight: 19, fontSize: 13 },
-  emptyCard: { marginTop: 30, padding: 24, alignItems: 'center', gap: 8, backgroundColor: theme.colors.white, borderRadius: 20, borderWidth: 1, borderColor: theme.colors.border },
+  emptyCard: { marginTop: 24, padding: 24, alignItems: 'center', gap: 10, backgroundColor: theme.colors.white, borderRadius: 20, borderWidth: 1, borderColor: theme.colors.border },
+  loadingCard: { padding: 24, alignItems: 'center', backgroundColor: theme.colors.white, borderRadius: 16, borderWidth: 1, borderColor: theme.colors.border },
+  resultCount: { color: theme.colors.muted, fontSize: 12, fontWeight: '700', marginTop: 2 },
+  primaryButton: { marginTop: 8, backgroundColor: theme.colors.forest, borderRadius: 12, paddingVertical: 13, paddingHorizontal: 18, alignItems: 'center', alignSelf: 'stretch' },
+  primaryButtonText: { color: theme.colors.white, fontWeight: '800', fontSize: 14 },
+  clearButton: { paddingVertical: 10, paddingHorizontal: 16, borderRadius: 10, borderWidth: 1, borderColor: theme.colors.forest, marginTop: 4 },
+  clearButtonText: { color: theme.colors.forest, fontWeight: '800' },
   emptyIcon: { fontSize: 36 },
   emptyTitle: { color: theme.colors.ink, fontWeight: '800', fontSize: 16 },
   empty: { color: theme.colors.muted, textAlign: 'center', lineHeight: 20 },
@@ -117,8 +124,6 @@ const styles = StyleSheet.create({
   ref: { color: theme.colors.forest, fontWeight: '900' },
   description: { color: theme.colors.ink, fontWeight: '600' },
   meta: { color: theme.colors.muted, fontSize: 12 },
-  exportButton: { backgroundColor: theme.colors.ink, paddingVertical: 13, paddingHorizontal: 14, alignItems: 'center', borderRadius: 12 },
-  exportButtonText: { color: theme.colors.white, fontWeight: '800', fontSize: 13 },
   emailButton: { marginTop: 5, backgroundColor: theme.colors.forest, paddingVertical: 12, paddingHorizontal: 14, alignItems: 'center', borderRadius: 12 },
   emailButtonText: { color: theme.colors.white, fontWeight: '800', fontSize: 13 },
   shareButton: { borderColor: theme.colors.forest, borderWidth: 1, paddingVertical: 11, paddingHorizontal: 14, alignItems: 'center', borderRadius: 12 },
