@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { listReports, saveReport } from '@/services/reportStore';
+import { listReports, restoreReportsFromBackup, saveReport } from '@/services/reportStore';
+import { createReportBackup } from '@/utils/reportBackup';
 import type { Report } from '@/types/report';
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
@@ -51,6 +52,28 @@ describe('reportStore', () => {
     await expect(saveReport(validReport)).rejects.toThrow('copie de secours');
     expect(storage.setItem).toHaveBeenCalledTimes(1);
     expect(storage.setItem).toHaveBeenCalledWith('maguissi-birr:reports:recovery-backup:v1', JSON.stringify([{ invalid: true }]));
+  });
+
+  it('restores new reports additively without overwriting existing records', async () => {
+    const existing = { ...validReport, description: 'Description locale à conserver.' };
+    const imported = { ...validReport, id: 'test-2', reference: 'MB-2026-000002', createdAt: '2026-10-09T12:00:00.000Z' };
+    storage.getItem.mockImplementation(async (key) => key === 'maguissi-birr:reports:v1' ? JSON.stringify([existing]) : null);
+
+    await expect(restoreReportsFromBackup(createReportBackup([validReport, imported]))).resolves.toEqual({ added: 1, skipped: 1 });
+
+    expect(storage.setItem).toHaveBeenCalledWith(
+      'maguissi-birr:reports:v1',
+      JSON.stringify([imported, existing])
+    );
+    expect(storage.setItem).not.toHaveBeenCalledWith('maguissi-birr:reports:v1', expect.stringContaining('Description de sauvegarde'));
+  });
+
+  it('refuses to restore over damaged local records', async () => {
+    storage.getItem.mockImplementation(async (key) => key === 'maguissi-birr:reports:v1' ? '{broken' : null);
+
+    await expect(restoreReportsFromBackup(createReportBackup([validReport]))).rejects.toThrow('copie de secours');
+    expect(storage.setItem).toHaveBeenCalledTimes(1);
+    expect(storage.setItem).toHaveBeenCalledWith('maguissi-birr:reports:recovery-backup:v1', '{broken');
   });
 
   it('stores a valid report alongside existing records', async () => {
