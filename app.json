@@ -26,7 +26,7 @@
     },
     "plugins": [
       "expo-router",
-      "expo-location",
+      ["expo-location", { "locationWhenInUsePermission": "Autorisez MAGUISSI BIRR à utiliser votre position uniquement si vous choisissez de l’ajouter à un signalement." }],
       [
         "expo-image-picker",
         {
