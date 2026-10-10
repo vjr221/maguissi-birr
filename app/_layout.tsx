@@ -34,7 +34,7 @@ export default function RootLayout() {
           title: 'Accueil',
           headerShown: false,
           tabBarLabel: 'Accueil',
-          tabBarIcon: ({ color, size }) => <Ionicons name="home" color={color} size={size}
+          tabBarIcon: ({ color, size }) => <Ionicons name="home" color={color} size={size} />
         }}
       />
       <Tabs.Screen
@@ -42,7 +42,7 @@ export default function RootLayout() {
         options={{
           title: 'Mes signalements',
           tabBarLabel: 'Signalements',
-          tabBarIcon: ({ color, size }) => <Ionicons name="document-text-outline" color={color} size={size}
+          tabBarIcon: ({ color, size }) => <Ionicons name="document-text-outline" color={color} size={size} />
         }}
       />
       <Tabs.Screen
@@ -50,7 +50,7 @@ export default function RootLayout() {
         options={{
           title: 'Nouveau signalement',
           tabBarLabel: 'Signaler',
-          tabBarIcon: ({ color, size }) => <Ionicons name="add-circle" color={color} size={size}
+          tabBarIcon: ({ color, size }) => <Ionicons name="add-circle" color={color} size={size} />
         }}
       />
       <Tabs.Screen
@@ -58,7 +58,7 @@ export default function RootLayout() {
         options={{
           title: 'Checklist prévention QHSE',
           tabBarLabel: 'Prévention',
-          tabBarIcon: ({ color, size }) => <Ionicons name="shield-checkmark-outline" color={color} size={size}
+          tabBarIcon: ({ color, size }) => <Ionicons name="shield-checkmark-outline" color={color} size={size} />
         }}
       />
       <Tabs.Screen
@@ -66,7 +66,7 @@ export default function RootLayout() {
         options={{
           title: 'Contacter SES',
           tabBarLabel: 'Contact',
-          tabBarIcon: ({ color, size }) => <Ionicons name="call-outline" color={color} size={size}
+          tabBarIcon: ({ color, size }) => <Ionicons name="call-outline" color={color} size={size} />
         }}
       />
       <Tabs.Screen name="tips" options={{ title: 'Conseils pratiques', href: null }} />
