@@ -36,7 +36,7 @@ describe('reportStore', () => {
   });
 
   it('sorts valid reports newest first', async () => {
-    const older = { ...validReport, id: 'older', createdAt: '2026-10-01T12:00:00.000Z' };
+    const older = { ...validReport, id: 'older', reference: 'MB-2026-000002', createdAt: '2026-10-01T12:00:00.000Z' };
     storage.getItem.mockResolvedValueOnce(JSON.stringify([older, validReport]));
     await expect(listReports()).resolves.toEqual([validReport, older]);
   });
@@ -48,10 +48,26 @@ describe('reportStore', () => {
   });
 
   it('does not overwrite the original data when a save finds invalid records', async () => {
-    storage.getItem.mockImplementation(async (key) => key === 'maguissi-birr:reports:v1' ? JSON.stringify([{ invalid: true }]) : null);
+    const invalid = JSON.stringify([{ invalid: true }]);
+    storage.getItem.mockImplementation(async (key) => key === 'maguissi-birr:reports:v1' ? invalid : null);
     await expect(saveReport(validReport)).rejects.toThrow('copie de secours');
     expect(storage.setItem).toHaveBeenCalledTimes(1);
-    expect(storage.setItem).toHaveBeenCalledWith('maguissi-birr:reports:recovery-backup:v1', JSON.stringify([{ invalid: true }]));
+    expect(storage.setItem).toHaveBeenCalledWith('maguissi-birr:reports:recovery-backup:v1', invalid);
+  });
+
+  it('backs up locally stored duplicate identities and refuses to read them as normal records', async () => {
+    const duplicate = { ...validReport, id: 'test-2' };
+    const raw = JSON.stringify([validReport, duplicate]);
+    storage.getItem.mockImplementation(async (key) => key === 'maguissi-birr:reports:v1' ? raw : null);
+    await expect(listReports()).rejects.toThrow('en double');
+    expect(storage.setItem).toHaveBeenCalledWith('maguissi-birr:reports:recovery-backup:v1', raw);
+  });
+
+  it('refuses to save a new report using another report’s reference', async () => {
+    storage.getItem.mockImplementation(async (key) => key === 'maguissi-birr:reports:v1' ? JSON.stringify([validReport]) : null);
+    const conflicting = { ...validReport, id: 'test-2' };
+    await expect(saveReport(conflicting)).rejects.toThrow('déjà associée');
+    expect(storage.setItem).not.toHaveBeenCalledWith('maguissi-birr:reports:v1', expect.any(String));
   });
 
   it('restores new reports additively without overwriting existing records', async () => {
@@ -70,7 +86,6 @@ describe('reportStore', () => {
 
   it('refuses to restore over damaged local records', async () => {
     storage.getItem.mockImplementation(async (key) => key === 'maguissi-birr:reports:v1' ? '{broken' : null);
-
     await expect(restoreReportsFromBackup(createReportBackup([validReport]))).rejects.toThrow('copie de secours');
     expect(storage.setItem).toHaveBeenCalledTimes(1);
     expect(storage.setItem).toHaveBeenCalledWith('maguissi-birr:reports:recovery-backup:v1', '{broken');
@@ -78,10 +93,11 @@ describe('reportStore', () => {
 
   it('stores a valid report alongside existing records', async () => {
     storage.getItem.mockResolvedValueOnce(JSON.stringify([validReport]));
-    await saveReport({ ...validReport, id: 'test-2', reference: 'MB-2026-000002' });
+    const added = { ...validReport, id: 'test-2', reference: 'MB-2026-000002' };
+    await saveReport(added);
     expect(storage.setItem).toHaveBeenCalledWith(
       'maguissi-birr:reports:v1',
-      JSON.stringify([{ ...validReport, id: 'test-2', reference: 'MB-2026-000002' }, validReport])
+      JSON.stringify([added, validReport])
     );
   });
 });
