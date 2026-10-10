@@ -7,7 +7,7 @@ Identité : projet indépendant de VJR 221.
 
 ## État à reprendre lors de la prochaine session
 
-- Derniers changements : `a2fec1e2e0084fbc7481fc8bc27c2ff3d06aba66` (génération d’identifiants locaux sans collision), `4d6e294df91e18f9431a1b4a7466f4ed7e3da473` (formulaire), `14807ef69572a3420eb5dd11dff867d6eadd1948` (tests de génération). Le formulaire relit d’abord les dossiers existants pour générer une référence disponible avant de copier les photos.
+- Derniers changements : `8ce34549b0059fdb1376bf3981f80ac175e91674` (refus d’un identifiant déjà attribué à un autre dossier), `21282af41e93719f201507573c21cb7d9cfefc57` (test de non-écrasement), puis `a2fec1e2e0084fbc7481fc8bc27c2ff3d06aba66`, `4d6e294df91e18f9431a1b4a7466f4ed7e3da473` et `14807ef69572a3420eb5dd11dff867d6eadd1948` (génération collision-safe et tests). Le formulaire relit les dossiers avant de copier les photos.
 - Changements de sauvegarde précédents : `71fff68843d7fec489d3d7fc6b82d568cf449b2c` (rejet des identifiants/références en double à l’export/import) et `ce08abf86696691bddd89f3e627d6f9722202a35` (tests de sauvegarde).
 - Changements applicatifs précédents : `49be8067ff5866a90c90879d8a2eb436d8a61879` (accessibilité du formulaire) et `5ad75448e44a544466a33f75234afb664b5ebff1` (libellés de navigation).
 - Les changements sont écrits sur `main`. **La CI pour les commits récents n’a pas été confirmée** : le connecteur GitHub disponible permet de consulter les tâches d’un run connu, mais ne fournit pas ici la liste des derniers runs push. Ne pas assimiler cette limite d’observation à un succès ou à un échec CI.
@@ -16,6 +16,11 @@ Identité : projet indépendant de VJR 221.
 - Version déclarée dans `package.json` et `app.json` : `1.0.1`. Ne pas publier de release finale sur la seule base du build de test.
 
 ## Changements récents
+
+### Protection contre les collisions d’identifiants — commits `8ce3454` et `21282af`
+- `saveReport` refuse désormais un identifiant déjà lié à une référence différente, au lieu de remplacer implicitement le dossier existant.
+- Un test dédié vérifie qu’aucune écriture de stockage n’est faite en cas de conflit d’identifiant.
+- La génération préalable vérifie aussi les identifiants et références déjà présents. Résultats CI de ces commits toujours non confirmés.
 
 ### Génération d’identifiants locaux — commits `a2fec1e`, `4d6e294` et `14807ef`
 - Ajout de `utils/reportIdentity.ts` pour générer un identifiant et une référence locale en vérifiant les dossiers déjà enregistrés, avec tentatives bornées et erreur explicite si aucune combinaison n’est disponible.
@@ -57,7 +62,7 @@ Ces changements nécessitent encore les vérifications TypeScript/tests via CI e
 
 1. Confirmer le résultat CI des derniers commits depuis GitHub Actions ou en déclenchant un run contrôlé ; corriger tout échec TypeScript ou Jest.
 2. Lire les journaux de tests et ne déclarer aucun contrôle réussi sans résultat observé.
-3. Confirmer la CI après les changements de génération d’identifiants, puis auditer les chemins de restauration/export de sauvegarde dans l’interface et vérifier qu’une erreur affiche un message compréhensible sans toucher aux dossiers locaux.
+3. Confirmer la CI après les changements de génération et de protection contre les collisions, puis auditer les chemins de restauration/export de sauvegarde dans l’interface et vérifier qu’une erreur affiche un message compréhensible sans toucher aux dossiers locaux.
 4. Vérifier l’accessibilité du formulaire et des cinq onglets avec TalkBack sur Android réel.
 5. Exécuter la checklist de validation : permissions GPS/caméra, refus de permissions, photos après redémarrage, stockage insuffisant, recherche/historique, navigation et démarrage à froid.
 6. Valider la notice de confidentialité, les responsabilités QHSE et les conditions d’utilisation avant toute bêta publique.
