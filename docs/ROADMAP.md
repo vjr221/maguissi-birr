@@ -22,7 +22,7 @@ La priorité est de rendre le MVP local fiable. Les fonctions serveur, la consol
 - [x] Tests unitaires initiaux et workflow CI.
 
 ### Validation encore requise avant bêta
-- [ ] Confirmer TypeScript et Jest sur le dernier commit candidat.
+- [x] TypeScript, Jest, Expo Doctor, bundle, build Android et démarrage à froid vérifiés sur le commit `d560d056bbc7851531b161038ab95dafd84df9e7` ([CI](https://github.com/vjr221/maguissi-birr/actions/runs/38016185663), [APK test](https://github.com/vjr221/maguissi-birr/actions/runs/38016185652)).
 - [ ] Reproduire la mise à jour depuis la version précédente sur un appareil de test, sans effacer les données ; enregistrer le message exact en cas de crash.
 - [ ] Vérifier la lecture des signalements historiques et la compatibilité des données avant/après mise à jour.
 - [ ] Tester sur un téléphone Android réel : démarrage, navigation, clavier, zones sûres et permissions.
