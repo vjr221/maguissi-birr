@@ -28,7 +28,9 @@ describe('report backup', () => {
     const raw = createReportBackup([report]);
     expect(parseReportBackup(raw)[0].photoUris).toEqual([]);
     expect(() => parseReportBackup('{broken')).toThrow('JSON valide');
-    expect(() => parseReportBackup(JSON.stringify({ app: 'Other', schemaVersion: 1, reports: [] }))).toThrow('compatible');
+    expect(() => parseReportBackup(JSON.stringify({ app: 'Other', schemaVersion: 1, exportedAt: '2026-10-10T00:00:00.000Z', reports: [] }))).toThrow('compatible');
+    expect(() => parseReportBackup(JSON.stringify({ app: 'MAGUISSI BIRR', schemaVersion: 1, exportedAt: 'not-a-date', reports: [] }))).toThrow('compatible');
+    expect(() => createReportBackup([report], 'not-a-date')).toThrow('date');
     expect(() => parseReportBackup(JSON.stringify({ app: 'MAGUISSI BIRR', schemaVersion: 1, reports: [{ ...report, region: 'unknown' }] }))).toThrow('invalides');
   });
 
