@@ -9,11 +9,12 @@ Ce plan distingue le code déjà présent, les validations qui bloquent une diff
 - [x] Catégories QHSE, 14 régions, description et localisation facultative.
 - [x] Capture caméra et sélection de photos dans la galerie.
 - [x] Persistance des photos dans le stockage de l’application et ré-encodage JPEG avant stockage.
+- [x] Persistance séquentielle des photos et nettoyage au mieux des copies partielles si une photo suivante échoue ; les URI sources existantes ne sont pas supprimées.
 - [x] Recherche/filtrage de l’historique et partage manuel du résumé.
 - [x] Export JSON et restauration additive, sans écrasement des dossiers locaux ; URI des photos exclues des sauvegardes.
 - [x] Validation des signalements et protections contre les données malformées, identifiants/références en double et collisions.
 - [x] Premiers tests unitaires, workflow CI et documentation produit.
-- [ ] Confirmer la CI sur les commits récents (typecheck et tests Jest) et corriger tout échec observé.
+- [ ] Confirmer la CI sur les commits récents (typecheck et tests Jest), notamment les nouveaux tests de persistance photo, et corriger tout échec observé.
 - [ ] Reproduire le scénario de mise à jour depuis la version publiée précédente sur un appareil de test, en conservant les données locales ; relever le message exact du crash avant de conclure à une cause.
 - [ ] Vérifier que les signalements créés avec l’ancien schéma restent lisibles et que toute migration éventuelle est additive et réversible.
 - [ ] Installer la version candidate sur un téléphone Android réel ; tester démarrage à froid, navigation, clavier et zones sûres.
