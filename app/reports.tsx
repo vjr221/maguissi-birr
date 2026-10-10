@@ -16,7 +16,7 @@ export default function ReportsScreen() {
   useFocusEffect(useCallback(() => {
     let active = true;
     listReports().then((items) => { if (active) setReports(items); })
-      .catch(() => { if (active) Alert.alert('Chargement impossible', 'Les signalements enregistrés sur cet appareil n’ont pas pu être lus.'); })
+      .catch((error: unknown) => { if (active) Alert.alert('Données locales à vérifier', error instanceof Error ? error.message : 'Les signalements enregistrés sur cet appareil n’ont pas pu être lus.'); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
   }, []));
