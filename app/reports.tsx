@@ -6,8 +6,7 @@ import type { Report } from '@/types/report';
 import { theme } from '@/constants/theme';
 import { statusLabel } from '@/utils/reportValidation';
 import { REPORT_CATEGORIES } from '@/constants/categories';
-
-const SES_EMAIL = 'moctar.diallo@sen-environnement-services.com';
+import { SES_CONTACT } from '@/constants/contact';
 
 export default function ReportsScreen() {
   const [reports, setReports] = useState<Report[]>([]);
@@ -69,8 +68,8 @@ export default function ReportsScreen() {
       [
         { text: 'Annuler', style: 'cancel' },
         { text: 'Continuer', onPress: () => {
-          const url = `mailto:${SES_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-          Linking.openURL(url).catch(() => Alert.alert('Messagerie indisponible', `Aucune application de messagerie compatible n’a pu être ouverte. Vous pouvez écrire à ${SES_EMAIL} depuis votre messagerie.`));
+          const url = `mailto:${SES_CONTACT.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+          Linking.openURL(url).catch(() => Alert.alert('Messagerie indisponible', `Aucune application de messagerie compatible n’a pu être ouverte. Vous pouvez écrire à ${SES_CONTACT.email} depuis votre messagerie.`));
         } }
       ]
     );
