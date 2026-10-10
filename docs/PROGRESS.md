@@ -8,6 +8,7 @@ Identité : projet indépendant de VJR 221.
 ## État à reprendre lors de la prochaine session
 
 - Dernière modification applicative : `49be8067ff5866a90c90879d8a2eb436d8a61879` — amélioration de l’accessibilité du formulaire de signalement.
+- Dernier commit de documentation au moment du point : `6acf178aa89c347c3f1a95b0add3399b516b2ad9` — mise à jour de la checklist pour signaler honnêtement que la CI des nouveaux changements reste en attente.
 - Modification précédente : `5ad75448e44a544466a33f75234afb664b5ebff1` — libellés de lecteur d’écran sur les cinq onglets principaux.
 - Les commits sont bien écrits sur `main`. **La CI après ces changements n’a pas encore été confirmée** au moment de cette note.
 - Dernière validation Android entièrement documentée : workflow [Android test APK #38010274393](https://github.com/vjr221/maguissi-birr/actions/runs/38010274393), sur le commit `4090d9c5d14e5c2c4a2ffe66ddb34b3811afc74c`. Elle a validé TypeScript, tests, Expo Doctor, compatibilité des dépendances, bundle, génération native, build APK et démarrage à froid sur émulateur. Ce résultat antérieur ne valide pas automatiquement les derniers changements.
