@@ -11,21 +11,40 @@ export function validateDescription(value: string): string | null {
 export function isValidReport(value: unknown): value is Report {
   if (!value || typeof value !== 'object') return false;
   const item = value as Partial<Report>;
-  return typeof item.id === 'string'
-    && typeof item.reference === 'string'
+  const statuses: ReportStatus[] = ['RECEIVED', 'QUALIFICATION', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED', 'CLOSED', 'REJECTED', 'DUPLICATE', 'NEEDS_INFO'];
+  const hasLatitude = typeof item.latitude === 'number';
+  const hasLongitude = typeof item.longitude === 'number';
+  const validCoordinates = hasLatitude === hasLongitude
+    && (!hasLatitude || (
+      Number.isFinite(item.latitude) && item.latitude! >= -90 && item.latitude! <= 90
+      && Number.isFinite(item.longitude) && item.longitude! >= -180 && item.longitude! <= 180
+    ));
+  return typeof item.id === 'string' && item.id.trim().length > 0
+    && typeof item.reference === 'string' && item.reference.trim().length > 0
     && typeof item.categoryId === 'string'
     && REPORT_CATEGORIES.some((category) => category.id === item.categoryId)
     && typeof item.description === 'string'
     && item.description.trim().length >= 12
+    && item.description.length <= 2000
     && typeof item.region === 'string'
     && REGIONS.includes(item.region)
+    && (item.locality === undefined || typeof item.locality === 'string')
     && Array.isArray(item.photoUris)
+    && item.photoUris.length <= 3
     && item.photoUris.every((uri) => typeof uri === 'string')
+    && validCoordinates
     && typeof item.createdAt === 'string'
     && !Number.isNaN(Date.parse(item.createdAt))
     && typeof item.status === 'string'
-    && ['RECEIVED', 'QUALIFICATION', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED', 'CLOSED', 'REJECTED', 'DUPLICATE', 'NEEDS_INFO'].includes(item.status)
-    && Array.isArray(item.events);
+    && statuses.includes(item.status as ReportStatus)
+    && Array.isArray(item.events)
+    && item.events.every((event) => !!event
+      && typeof event === 'object'
+      && typeof event.status === 'string'
+      && statuses.includes(event.status as ReportStatus)
+      && typeof event.at === 'string'
+      && !Number.isNaN(Date.parse(event.at))
+      && (event.note === undefined || typeof event.note === 'string'));
 }
 
 export function statusLabel(status: ReportStatus): string {
