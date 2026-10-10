@@ -14,7 +14,7 @@ Ce plan distingue le code déjà présent, les validations qui bloquent une diff
 - [x] Export JSON et restauration additive, sans écrasement des dossiers locaux ; URI des photos exclues des sauvegardes.
 - [x] Validation des signalements et protections contre les données malformées, identifiants/références en double et collisions.
 - [x] Premiers tests unitaires, workflow CI et documentation produit.
-- [ ] Confirmer la CI sur les commits récents (typecheck et tests Jest), notamment les nouveaux tests de persistance photo, et corriger tout échec observé.
+- [x] CI confirmée sur le commit `d560d056bbc7851531b161038ab95dafd84df9e7` : TypeScript, tests Jest, Expo Doctor, export du bundle, génération native, build APK et démarrage à froid sur émulateur réussis ([CI](https://github.com/vjr221/maguissi-birr/actions/runs/38016185663), [APK test](https://github.com/vjr221/maguissi-birr/actions/runs/38016185652)).
 - [ ] Tester la non-régression de mise à jour depuis la version précédente sur un appareil de test, en conservant les données locales (le crash signalé auparavant est déjà corrigé selon l’utilisateur).
 - [ ] Vérifier que les signalements créés avec l’ancien schéma restent lisibles et que toute migration éventuelle est additive et réversible.
 - [ ] Simuler une clé de stockage absente, un tableau JSON vide et une chaîne de stockage vide/malformée ; seule la clé absente doit être interprétée comme une liste vide.
