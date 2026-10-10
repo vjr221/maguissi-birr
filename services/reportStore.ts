@@ -14,6 +14,17 @@ async function preserveRawData(raw: string): Promise<void> {
   }
 }
 
+function hasUniqueIdentities(reports: Report[]): boolean {
+  const ids = new Set<string>();
+  const references = new Set<string>();
+  for (const report of reports) {
+    if (ids.has(report.id) || references.has(report.reference)) return false;
+    ids.add(report.id);
+    references.add(report.reference);
+  }
+  return true;
+}
+
 export async function listReports(): Promise<Report[]> {
   const raw = await AsyncStorage.getItem(KEY);
   if (!raw) return [];
@@ -31,6 +42,11 @@ export async function listReports(): Promise<Report[]> {
     throw new Error('Certains signalements locaux sont illisibles. Une copie de secours a été conservée ; aucun enregistrement ne sera remplacé automatiquement.');
   }
 
+  if (!hasUniqueIdentities(parsed)) {
+    await preserveRawData(raw);
+    throw new Error('Des identifiants ou références de signalements sont en double. Une copie de secours a été conservée ; aucun enregistrement ne sera remplacé automatiquement.');
+  }
+
   return parsed.sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
 }
 
@@ -39,6 +55,10 @@ export async function saveReport(report: Report): Promise<void> {
   // listReports throws if existing data is malformed, preventing a new save
   // from silently replacing and losing the previous local records.
   const current = await listReports();
+  const referenceOwner = current.find((item) => item.reference === report.reference && item.id !== report.id);
+  if (referenceOwner) {
+    throw new Error('Cette référence est déjà associée à un autre signalement. Aucun dossier n’a été modifié.');
+  }
   await AsyncStorage.setItem(KEY, JSON.stringify([report, ...current.filter((item) => item.id !== report.id)]));
 }
 
