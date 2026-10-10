@@ -76,6 +76,9 @@ export default function ReportsScreen() {
           try {
             const picked = await DocumentPicker.getDocumentAsync({ type: ['application/json', 'text/json', 'public.json'], copyToCacheDirectory: true, multiple: false });
             if (picked.canceled || !picked.assets[0]) return;
+            const fileInfo = await FileSystem.getInfoAsync(picked.assets[0].uri);
+            if (!fileInfo.exists || typeof fileInfo.size !== 'number') throw new Error('Impossible de vérifier la taille du fichier sélectionné.');
+            if (fileInfo.size > 10 * 1024 * 1024) throw new Error('Le fichier de sauvegarde dépasse la limite de 10 Mo. Choisissez une sauvegarde plus petite.');
             const raw = await FileSystem.readAsStringAsync(picked.assets[0].uri, { encoding: FileSystem.EncodingType.UTF8 });
             const result = await restoreReportsFromBackup(raw);
             const refreshed = await listReports();

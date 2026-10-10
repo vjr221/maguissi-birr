@@ -4,6 +4,10 @@ import { isValidReport } from '@/utils/reportValidation';
 export const REPORT_BACKUP_APP = 'MAGUISSI BIRR';
 export const REPORT_BACKUP_VERSION = 1;
 
+/** Bound import work so a malformed file cannot exhaust device memory. */
+export const MAX_BACKUP_CHARACTERS = 10 * 1024 * 1024;
+export const MAX_BACKUP_REPORTS = 5000;
+
 export type ReportBackup = {
   app: typeof REPORT_BACKUP_APP;
   schemaVersion: typeof REPORT_BACKUP_VERSION;
@@ -25,6 +29,7 @@ function hasUniqueIdentities(reports: Report[]): boolean {
 /** Photos are intentionally excluded: local file URIs cannot be restored on another device. */
 export function createReportBackup(reports: Report[], exportedAt = new Date().toISOString()): string {
   if (!Number.isFinite(Date.parse(exportedAt))) throw new Error('La date de création de la sauvegarde est invalide.');
+  if (reports.length > MAX_BACKUP_REPORTS) throw new Error('La sauvegarde dépasse le nombre maximal de signalements autorisé.');
   if (!reports.every(isValidReport)) throw new Error('Impossible de sauvegarder des signalements invalides.');
   if (!hasUniqueIdentities(reports)) throw new Error('Impossible de sauvegarder des signalements avec des identifiants ou références en double.');
   const document: ReportBackup = {
@@ -38,6 +43,7 @@ export function createReportBackup(reports: Report[], exportedAt = new Date().to
 
 /** Validate the whole document before any stored data can be changed. */
 export function parseReportBackup(raw: string): Report[] {
+  if (raw.length > MAX_BACKUP_CHARACTERS) throw new Error('Le fichier de sauvegarde est trop volumineux (limite de 10 Mo).');
   let parsed: unknown;
   try {
     parsed = JSON.parse(raw);
@@ -49,6 +55,7 @@ export function parseReportBackup(raw: string): Report[] {
   if (document.app !== REPORT_BACKUP_APP || document.schemaVersion !== REPORT_BACKUP_VERSION || !Array.isArray(document.reports) || typeof document.exportedAt !== 'string' || !Number.isFinite(Date.parse(document.exportedAt))) {
     throw new Error('Ce fichier n’est pas une sauvegarde MAGUISSI BIRR compatible.');
   }
+  if (document.reports.length > MAX_BACKUP_REPORTS) throw new Error('La sauvegarde dépasse le nombre maximal de 5 000 signalements.');
   const reports = document.reports.map((item) => {
     if (!item || typeof item !== 'object') return item;
     // Photo URIs are device-specific paths; never import them from another installation.

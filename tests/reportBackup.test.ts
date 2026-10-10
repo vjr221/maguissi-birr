@@ -1,5 +1,5 @@
 import type { Report } from '@/types/report';
-import { createReportBackup, mergeReportBackup, parseReportBackup } from '@/utils/reportBackup';
+import { createReportBackup, mergeReportBackup, parseReportBackup, MAX_BACKUP_CHARACTERS, MAX_BACKUP_REPORTS } from '@/utils/reportBackup';
 
 const report: Report = {
   id: 'report-a',
@@ -32,6 +32,14 @@ describe('report backup', () => {
     expect(() => parseReportBackup(JSON.stringify({ app: 'MAGUISSI BIRR', schemaVersion: 1, exportedAt: 'not-a-date', reports: [] }))).toThrow('compatible');
     expect(() => createReportBackup([report], 'not-a-date')).toThrow('date');
     expect(() => parseReportBackup(JSON.stringify({ app: 'MAGUISSI BIRR', schemaVersion: 1, exportedAt: '2026-10-10T00:00:00.000Z', reports: [{ ...report, region: 'unknown' }] }))).toThrow('invalides');
+  });
+
+  it('rejects oversized backup files and excessive report counts before processing records', () => {
+    expect(() => parseReportBackup(' '.repeat(MAX_BACKUP_CHARACTERS + 1))).toThrow('trop volumineux');
+    const base = { app: 'MAGUISSI BIRR', schemaVersion: 1, exportedAt: '2026-10-10T00:00:00.000Z' };
+    const tooMany = Array.from({ length: MAX_BACKUP_REPORTS + 1 }, (_, index) => ({ ...report, id: 'report-' + index, reference: 'MB-2026-' + String(index).padStart(6, '0') }));
+    expect(() => parseReportBackup(JSON.stringify({ ...base, reports: tooMany }))).toThrow('5 000');
+    expect(() => createReportBackup(tooMany)).toThrow('nombre maximal');
   });
 
   it('rejects duplicate ids or references in exported and imported backup documents', () => {
