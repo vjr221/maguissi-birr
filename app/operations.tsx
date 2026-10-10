@@ -30,17 +30,37 @@ function Metric({ value, label, tone = 'green' }: { value: number; label: string
 export default function OperationsScreen() {
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [filter, setFilter] = useState<QueueFilter>('open');
   const [query, setQuery] = useState('');
   const [savingId, setSavingId] = useState<string | null>(null);
   const [expandedIds, setExpandedIds] = useState<string[]>([]);
   const refresh = useCallback(async () => {
     setLoading(true);
+    setLoadError(null);
     try { setReports(await listReports()); }
-    catch (error: unknown) { Alert.alert('Chargement impossible', error instanceof Error ? error.message : 'Les signalements locaux n’ont pas pu être lus.'); }
-    finally { setLoading(false); }
+    catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Les signalements locaux n’ont pas pu être lus.';
+      setLoadError(message);
+      Alert.alert('Chargement impossible', message);
+    } finally { setLoading(false); }
   }, []);
-  useFocusEffect(useCallback(() => { let active = true; listReports().then((items) => { if (active) setReports(items); }).catch((error: unknown) => { if (active) Alert.alert('Données locales à vérifier', error instanceof Error ? error.message : 'Les signalements enregistrés sur cet appareil n’ont pas pu être lus. Aucun dossier ne sera remplacé automatiquement.'); }).finally(() => { if (active) setLoading(false); }); return () => { active = false; }; }, []));
+  useFocusEffect(useCallback(() => {
+    let active = true;
+    setLoading(true);
+    setLoadError(null);
+    listReports()
+      .then((items) => { if (active) setReports(items); })
+      .catch((error: unknown) => {
+        if (active) {
+          const message = error instanceof Error ? error.message : 'Les signalements enregistrés sur cet appareil n’ont pas pu être lus. Aucun dossier ne sera remplacé automatiquement.';
+          setLoadError(message);
+          Alert.alert('Données locales à vérifier', message);
+        }
+      })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, []));
   const counts = useMemo(() => ({
     total: reports.length,
     open: reports.filter((r) => !DONE.includes(r.status) && !ACTIVE.includes(r.status)).length,
@@ -63,10 +83,11 @@ export default function OperationsScreen() {
     const at = new Date().toISOString();
     const updated: Report = { ...report, status, events: [...report.events, { status, at, note: `Suivi personnel local : ${statusLabel(status)}` }] };
     try {
+      if (loadError) throw new Error('Le stockage local doit être relu correctement avant toute modification.');
       await saveReport(updated);
       setReports((current) => current.map((item) => item.id === report.id ? updated : item));
-    } catch {
-      Alert.alert('Modification non enregistrée', 'Le changement de statut n’a pas pu être sauvegardé sur cet appareil.');
+    } catch (error: unknown) {
+      Alert.alert('Modification non enregistrée', error instanceof Error ? error.message : 'Le changement de statut n’a pas pu être sauvegardé sur cet appareil.');
     } finally { setSavingId(null); }
   };
   const requestStatusChange = (report: Report, status: ReportStatus) => {
@@ -84,13 +105,14 @@ export default function OperationsScreen() {
     <View style={styles.hero}>
       <View style={styles.heroTop}><View style={styles.heroIcon}><Ionicons name="clipboard-outline" size={24} color={theme.colors.forest} /></View><View style={{ flex: 1 }}><Text style={styles.eyebrow}>MAGUISSI BIRR · QHSE</Text><Text style={styles.heroTitle}>Suivi personnel</Text></View><Pressable accessibilityRole="button" accessibilityLabel="Actualiser" onPress={refresh} style={styles.refresh}><Ionicons name="refresh-outline" size={20} color={theme.colors.white} /></Pressable></View>
       <Text style={styles.heroBody}>Un espace personnel pour consulter vos dossiers et noter votre suivi sur cet appareil. Les changements ne sont ni des affectations officielles ni des résolutions validées par une équipe.</Text>
-      <View style={styles.metrics}><Metric value={counts.total} label="Total" /><Metric value={counts.open} label="À traiter" tone="amber" /><Metric value={counts.progress} label="En cours" /><Metric value={counts.priority} label="Prioritaires" tone="red" /></View>
+      {!loadError && <View style={styles.metrics}><Metric value={counts.total} label="Total" /><Metric value={counts.open} label="À traiter" tone="amber" /><Metric value={counts.progress} label="En cours" /><Metric value={counts.priority} label="Prioritaires" tone="red" /></View>}
     </View>
+    {loadError && !loading && <View style={styles.errorCard}><Ionicons name="alert-circle-outline" size={30} color={theme.colors.danger} /><Text style={styles.emptyTitle}>Dossiers indisponibles</Text><Text style={styles.emptyText}>Le stockage local n’a pas pu être lu. Les compteurs et la file sont masqués pour éviter de présenter des zéros trompeurs. Aucune modification ne doit être tentée tant que les données ne sont pas accessibles.</Text><Text style={styles.errorDetails}>{loadError}</Text><Pressable accessibilityRole="button" onPress={() => { void refresh(); }} style={styles.retryButton}><Ionicons name="refresh-outline" size={16} color={theme.colors.white} /><Text style={styles.retryText}>Réessayer la lecture</Text></Pressable><Text style={styles.emptyText}>Ne désinstallez pas l’application et conservez la copie de récupération pour diagnostic.</Text></View>}
     <View style={styles.localNotice}><Ionicons name="phone-portrait-outline" size={18} color="#715314" /><Text style={styles.localNoticeText}>Mode local : les dossiers et changements de statut restent sur cet appareil. Aucune équipe distante n’est notifiée et aucune affectation réelle n’est envoyée.</Text></View>
     <Text style={styles.sectionTitle}>File de traitement</Text>
     <TextInput value={query} onChangeText={setQuery} placeholder="Référence, région, catégorie…" placeholderTextColor={theme.colors.muted} style={styles.search} />
     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filters}>{FILTERS.map((item) => <Pressable key={item.id} accessibilityRole="button" accessibilityState={{ selected: filter === item.id }} onPress={() => setFilter(item.id)} style={[styles.filter, filter === item.id && styles.filterActive]}><Text style={[styles.filterText, filter === item.id && styles.filterTextActive]}>{item.label}</Text></Pressable>)}</ScrollView>
-    {loading ? <Text style={styles.empty}>Chargement des dossiers…</Text> : visible.length === 0 ? <View style={styles.emptyCard}><Ionicons name="file-tray-outline" size={32} color={theme.colors.muted} /><Text style={styles.emptyTitle}>Aucun dossier dans cette vue</Text><Text style={styles.emptyText}>Créez un signalement ou changez le filtre pour afficher les autres dossiers.</Text></View> : visible.map((report) => {
+    {loading ? <Text style={styles.empty}>Chargement des dossiers…</Text> : loadError ? null : visible.length === 0 ? <View style={styles.emptyCard}><Ionicons name="file-tray-outline" size={32} color={theme.colors.muted} /><Text style={styles.emptyTitle}>Aucun dossier dans cette vue</Text><Text style={styles.emptyText}>Créez un signalement ou changez le filtre pour afficher les autres dossiers.</Text></View> : visible.map((report) => {
       const category = REPORT_CATEGORIES.find((item) => item.id === report.categoryId)?.label ?? 'Autre situation';
       const priority = isPriorityReport(report);
       const busy = savingId === report.id;
@@ -140,6 +162,10 @@ const styles = StyleSheet.create({
   filterText: { color: theme.colors.ink, fontSize: 12, fontWeight: '700' },
   filterTextActive: { color: theme.colors.white },
   empty: { color: theme.colors.muted, textAlign: 'center', padding: 20 },
+  errorCard: { backgroundColor: theme.colors.white, borderWidth: 1, borderColor: theme.colors.border, borderRadius: 18, padding: 20, alignItems: 'center', gap: 12 },
+  errorDetails: { color: theme.colors.danger, fontSize: 12, lineHeight: 18, textAlign: 'left', alignSelf: 'stretch' },
+  retryButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: theme.colors.forest, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 11 },
+  retryText: { color: theme.colors.white, fontWeight: '800', fontSize: 12 },
   emptyCard: { backgroundColor: theme.colors.white, borderRadius: 17, padding: 24, alignItems: 'center', gap: 9, borderWidth: 1, borderColor: theme.colors.border },
   emptyTitle: { color: theme.colors.ink, fontSize: 15, fontWeight: '900' },
   emptyText: { color: theme.colors.muted, fontSize: 12, textAlign: 'center', lineHeight: 18 },
