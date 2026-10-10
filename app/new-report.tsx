@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Alert, Image, Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
@@ -14,6 +15,7 @@ export default function NewReportScreen() {
   const [region, setRegion] = useState('Dakar');
   const [locality, setLocality] = useState('');
   const [description, setDescription] = useState('');
+  const [dangerImmediate, setDangerImmediate] = useState(false);
   const [coords, setCoords] = useState<{ latitude: number; longitude: number } | undefined>();
   const [photoUris, setPhotoUris] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
@@ -58,8 +60,9 @@ export default function NewReportScreen() {
     setSaving(true);
     try {
       const now = new Date().toISOString();
-      const id = `${Date.now()}`;
-      const report: Report = { id, reference: `MB-${new Date().getFullYear()}-${id.slice(-6)}`, categoryId, description: description.trim(), region, locality: locality.trim() || undefined, ...coords, photoUris, createdAt: now, status: 'RECEIVED', events: [{ status: 'RECEIVED', at: now, note: 'Enregistré sur cet appareil' }] };
+      const id = `${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
+      const referenceSuffix = Math.random().toString(36).slice(2, 10).toUpperCase();
+      const report: Report = { id, reference: `MB-${new Date().getFullYear()}-${referenceSuffix}`, categoryId, description: description.trim(), dangerImmediate, region, locality: locality.trim() || undefined, ...coords, photoUris, createdAt: now, status: 'RECEIVED', events: [{ status: 'RECEIVED', at: now, note: 'Enregistré sur cet appareil' }] };
       await saveReport(report);
       Alert.alert('Signalement enregistré', `Référence locale : ${report.reference}. Elle est conservée sur cet appareil et n'a pas été transmise à un serveur.`, [
         { text: 'Partager la référence', onPress: () => { void Share.share({ message: `MAGUISSI BIRR — Référence locale ${report.reference}. Ce signalement n'a pas encore été transmis à un serveur.` }); } },
@@ -76,6 +79,7 @@ export default function NewReportScreen() {
     <Text style={styles.label}>2. Région</Text>
     <View style={styles.regions}>{REGIONS.map((item) => <Pressable key={item} accessibilityRole="button" accessibilityState={{ selected: region === item }} onPress={() => setRegion(item)} style={[styles.region, region === item && styles.regionSelected]}><Text style={[styles.regionText, region === item && styles.regionTextSelected]}>{item}</Text></Pressable>)}</View>
     <Text style={styles.label}>Localité ou repère (facultatif)</Text><TextInput value={locality} onChangeText={setLocality} placeholder="Commune, quartier, rue…" placeholderTextColor={theme.colors.muted} style={styles.input} />
+    <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: dangerImmediate }} onPress={() => setDangerImmediate((value) => !value)} style={[styles.dangerToggle, dangerImmediate && styles.dangerToggleActive]}><Ionicons name={dangerImmediate ? 'checkbox' : 'square-outline'} size={24} color={dangerImmediate ? theme.colors.danger : theme.colors.muted} /><View style={{ flex: 1, gap: 3 }}><Text style={styles.dangerTitle}>Danger immédiat ?</Text><Text style={styles.dangerHelp}>Cochez uniquement si une personne, un site ou l’environnement semble exposé à un risque immédiat. Cela ne déclenche pas d’alerte à distance.</Text></View></Pressable>
     <Text style={styles.label}>3. Description</Text><TextInput value={description} onChangeText={setDescription} multiline textAlignVertical="top" maxLength={2000} placeholder="Que s’est-il passé ? Où ? Quand ? Y a-t-il un danger immédiat ?" placeholderTextColor={theme.colors.muted} style={[styles.input, styles.textarea]} /><Text style={styles.counter}>{description.length}/2000</Text>
     <Text style={styles.label}>4. Éléments complémentaires (facultatif)</Text>
     <View style={styles.row}><Pressable accessibilityRole="button" accessibilityLabel={coords ? 'Retirer les coordonnées GPS' : 'Ajouter ma position GPS'} onPress={() => coords ? setCoords(undefined) : void addLocation()} style={[styles.secondary, coords && styles.secondarySelected]}><Text style={styles.secondaryText}>{coords ? '✓ GPS ajouté · retirer' : '📍 Ajouter ma position'}</Text></Pressable><Pressable accessibilityRole="button" onPress={takePhoto} style={styles.secondary}><Text style={styles.secondaryText}>📸 Prendre une photo</Text></Pressable><Pressable accessibilityRole="button" onPress={addPhoto} style={styles.secondary}><Text style={styles.secondaryText}>🖼️ Galerie ({photoUris.length}/3)</Text></Pressable></View>
