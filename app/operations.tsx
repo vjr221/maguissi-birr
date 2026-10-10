@@ -45,7 +45,7 @@ export default function OperationsScreen() {
     total: reports.length,
     open: reports.filter((r) => !DONE.includes(r.status) && !ACTIVE.includes(r.status)).length,
     progress: reports.filter((r) => ACTIVE.includes(r.status)).length,
-    priority: reports.filter(isPriority).filter((r) => !DONE.includes(r.status)).length,
+    priority: reports.filter(isPriorityReport).filter((r) => !DONE.includes(r.status)).length,
     resolved: reports.filter((r) => ['RESOLVED', 'CLOSED'].includes(r.status)).length
   }), [reports]);
   const visible = useMemo(() => {
