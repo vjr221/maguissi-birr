@@ -29,6 +29,7 @@ on:
       - "services/**"
       - "types/**"
       - "utils/**"
+      - "tests/**"
       - "assets/**"
       - "app.json"
       - "package.json"
