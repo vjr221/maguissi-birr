@@ -7,6 +7,8 @@ export type Report = {
   reference: string;
   categoryId: string;
   description: string;
+  /** Optional for backwards compatibility with reports saved by older app versions. */
+  dangerImmediate?: boolean;
   region: string;
   locality?: string;
   latitude?: number;
