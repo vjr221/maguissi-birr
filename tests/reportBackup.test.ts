@@ -34,6 +34,17 @@ describe('report backup', () => {
     expect(() => parseReportBackup(JSON.stringify({ app: 'MAGUISSI BIRR', schemaVersion: 1, exportedAt: '2026-10-10T00:00:00.000Z', reports: [{ ...report, region: 'unknown' }] }))).toThrow('invalides');
   });
 
+  it('rejects duplicate ids or references in exported and imported backup documents', () => {
+    const sameId = { ...report, reference: 'MB-2026-000002' };
+    const sameReference = { ...report, id: 'report-b' };
+    expect(() => createReportBackup([report, sameId])).toThrow('en double');
+    expect(() => createReportBackup([report, sameReference])).toThrow('en double');
+
+    const base = { app: 'MAGUISSI BIRR', schemaVersion: 1, exportedAt: '2026-10-10T00:00:00.000Z' };
+    expect(() => parseReportBackup(JSON.stringify({ ...base, reports: [report, sameId] }))).toThrow('en double');
+    expect(() => parseReportBackup(JSON.stringify({ ...base, reports: [report, sameReference] }))).toThrow('en double');
+  });
+
   it('merges without overwriting existing records and ignores duplicate ids or references', () => {
     const existing = { ...report, description: 'Description locale à conserver.' };
     const duplicateId = { ...report, description: 'Description de la sauvegarde.' };
