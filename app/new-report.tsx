@@ -70,8 +70,9 @@ export default function NewReportScreen() {
         { text: 'Partager la référence', onPress: () => { void Share.share({ message: `MAGUISSI BIRR — Référence locale ${report.reference}. Ce signalement n'a pas encore été transmis à un serveur.` }); } },
         { text: 'Voir mes signalements', onPress: () => router.replace('/reports') }
       ]);
-    } catch { Alert.alert('Enregistrement impossible', 'Vérifiez l’espace disponible puis réessayez.'); }
-    finally { setSaving(false); }
+    } catch (error: unknown) {
+      Alert.alert('Enregistrement impossible', error instanceof Error ? error.message : 'Vérifiez l’espace disponible et l’intégrité des données locales, puis réessayez.');
+    } finally { setSaving(false); }
   }
 
   return <ScrollView contentContainerStyle={styles.page} keyboardShouldPersistTaps="handled">
