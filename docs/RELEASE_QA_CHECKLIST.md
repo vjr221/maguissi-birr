@@ -25,6 +25,7 @@ Le workflow [Android test APK, run 38010274393](https://github.com/vjr221/maguis
 - [ ] Vérifier que la génération d’identifiant/référence retente une collision et affiche une erreur sûre si les tentatives sont épuisées.
 - [ ] Rechercher, filtrer et ouvrir les signalements ; modifier le statut et vérifier l’historique.
 - [ ] Vérifier qu’une erreur de lecture ne se transforme pas en liste vide et n’écrase pas les données.
+- [ ] Simuler une erreur de lecture dans l’écran Statistiques et vérifier qu’il affiche un état d’erreur, pas des compteurs à zéro.
 - [ ] Vérifier que l’écran affiche un état d’erreur explicite plutôt que « Aucun signalement enregistré » si le stockage local est illisible.
 - [ ] Vérifier qu’une clé absente produit une liste vide, tandis qu’une chaîne de stockage vide est sauvegardée comme donnée malformée dans la copie de récupération.
 - [ ] Vérifier qu’une copie de récupération préexistante différente n’est jamais écrasée et que l’interface précise que les données malformées actuelles n’ont pas été copiées.
