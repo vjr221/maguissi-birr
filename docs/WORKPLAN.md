@@ -1,33 +1,50 @@
-# Plan de développement
+# Plan de développement MAGUISSI BIRR
 
-## Fondations mobiles
-- [x] Dépôt indépendant.
-- [x] Écrans de base, formulaire et historique local.
-- [x] Catégories QHSE et 14 régions.
-- [x] Conseils environnementaux enrichis.
-- [x] Validation du contenu et contrôle des données locales.
-- [x] Tests unitaires initiaux et CI.
-- [x] Documentation produit, architecture, workflow et confidentialité de travail.
+Ce plan distingue le code déjà présent, les validations qui bloquent une diffusion fiable et les évolutions reportables. Ne pas refaire une fonction déjà présente : vérifier d’abord son code et ses tests.
 
-## Prochaine étape — MVP fiable
-- [ ] Vérifier le résultat complet de la CI et corriger chaque échec.
-- [ ] Tester Android sur appareil réel, notamment GPS, permissions, médias et persistance après redémarrage.
-- [ ] Ajouter capture caméra et gestion robuste des URI de médias.
-- [ ] Ajouter recherche/filtrage de l'historique, détail de dossier et export local.
-- [ ] Auditer le dépôt historique et importer les éléments de marque/licence utiles sans importer des dépendances à VJR 221.
+## Priorité immédiate — fiabilité du MVP local
 
-## Version connectée
-- [ ] Concevoir et déployer une API sécurisée versionnée.
+- [x] Dépôt GitHub indépendant et architecture mobile Expo / React Native / TypeScript.
+- [x] Écrans principaux, formulaire et historique des signalements conservés localement.
+- [x] Catégories QHSE, 14 régions, description et localisation facultative.
+- [x] Capture caméra et sélection de photos dans la galerie.
+- [x] Persistance des photos dans le stockage de l’application et ré-encodage JPEG avant stockage.
+- [x] Recherche/filtrage de l’historique et partage manuel du résumé.
+- [x] Export JSON et restauration additive, sans écrasement des dossiers locaux ; URI des photos exclues des sauvegardes.
+- [x] Validation des signalements et protections contre les données malformées, identifiants/références en double et collisions.
+- [x] Premiers tests unitaires, workflow CI et documentation produit.
+- [ ] Confirmer la CI sur les commits récents (typecheck et tests Jest) et corriger tout échec observé.
+- [ ] Installer la version candidate sur un téléphone Android réel ; tester démarrage à froid, navigation, clavier et zones sûres.
+- [ ] Tester permissions GPS/caméra/galerie acceptées et refusées, ainsi que l’absence de réseau et le stockage insuffisant.
+- [ ] Vérifier les photos après fermeture/redémarrage, la création de signalements et la recherche/historique.
+- [ ] Tester export et restauration avec une sauvegarde de test ; confirmer que les données existantes ne sont jamais remplacées.
+- [ ] Vérifier les libellés avec TalkBack et les parcours d’erreur.
+- [ ] Corriger tout défaut bloquant trouvé avant de préparer une bêta.
+
+## Avant toute diffusion publique — prérequis
+
+- [ ] Valider la notice de confidentialité, les conditions d’utilisation, le responsable du traitement et les durées de conservation.
+- [ ] Valider les conseils de sécurité, les responsabilités QHSE et les règles d’escalade avec les personnes compétentes.
+- [ ] Vérifier la marque, les licences et les droits sur les ressources graphiques avant toute migration éventuelle d’éléments historiques.
+- [ ] Préparer une bêta signée seulement après validation automatisée et manuelle.
+
+## À reporter — version connectée et console
+
+Ces travaux ne sont pas requis pour fiabiliser le MVP local et ne doivent pas retarder ses tests de base. Les lancer seulement quand SES confirme le besoin, le responsable opérationnel, les accès autorisés, le budget et les règles de traitement des données.
+
+- [ ] Concevoir et déployer une API HTTPS versionnée.
 - [ ] Base PostgreSQL, migrations, authentification, rôles et organisations.
 - [ ] Téléversement sécurisé, référence officielle et chronologie côté serveur.
+- [ ] Synchronisation hors ligne avec file d’envoi, idempotence et états d’envoi confirmés.
 - [ ] Notifications, affectation, suivi, actions correctives et console professionnelle.
-- [ ] Sauvegardes, surveillance, gestion des abus, tests de sécurité et plan de reprise.
+- [ ] Sauvegardes serveur, surveillance, gestion des abus, tests de sécurité et plan de reprise.
+- [ ] Cartographie opérationnelle, indicateurs avancés et exports de gestion.
 
-## Avant publication
-- [ ] Valider responsabilités, procédure QHSE et règles d'escalade avec les acteurs métier.
-- [ ] Finaliser politique de confidentialité et conditions d'utilisation avec conseil compétent.
-- [ ] Tester sur appareils réels et faible connectivité.
-- [ ] Vérifier accessibilité, performances, compatibilité, sécurité et dépendances.
-- [ ] Produire une bêta signée et la faire tester avant la release publique.
+## À reporter — améliorations non bloquantes
 
-Aucune release de production ne doit être annoncée tant que les contrôles, le fonctionnement réel des fonctions promises et la gestion des données ne sont pas validés.
+- [ ] Écran de détail de dossier plus riche.
+- [ ] Micro-formations, campagnes de sensibilisation et nouveaux contenus de prévention.
+- [ ] Import de ressources graphiques historiques après audit des licences.
+- [ ] Finitions visuelles supplémentaires après les tests d’accessibilité et d’usage.
+
+Aucune release de production ne doit être annoncée tant que la CI du commit candidat, les essais sur appareil réel, les exigences de confidentialité et les responsabilités opérationnelles ne sont pas validés. Aucune fonctionnalité serveur ne doit être annoncée avant son déploiement effectif.
