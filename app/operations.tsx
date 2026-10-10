@@ -16,17 +16,15 @@ const FILTERS: { id: QueueFilter; label: string }[] = [
 ];
 const ACTIONS: { status: ReportStatus; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
   { status: 'QUALIFICATION', label: 'À qualifier', icon: 'search-outline' },
-  { status: 'ASSIGNED', label: 'Affecter', icon: 'person-add-outline' },
-  { status: 'IN_PROGRESS', label: 'Démarrer', icon: 'play-outline' },
+  { status: 'ASSIGNED', label: 'Marquer comme affecté (local)', icon: 'person-add-outline' },
+  { status: 'IN_PROGRESS', label: 'Marquer en cours (local)', icon: 'play-outline' },
   { status: 'NEEDS_INFO', label: 'Infos requises', icon: 'help-circle-outline' },
-  { status: 'RESOLVED', label: 'Résoudre', icon: 'checkmark-circle-outline' }
+  { status: 'RESOLVED', label: 'Marquer résolu (local)', icon: 'checkmark-circle-outline' }
 ];
 const DONE: ReportStatus[] = ['RESOLVED', 'CLOSED', 'REJECTED', 'DUPLICATE'];
 const ACTIVE: ReportStatus[] = ['ASSIGNED', 'IN_PROGRESS'];
 function isPriority(report: Report): boolean {
-  const category = REPORT_CATEGORIES.find((item) => item.id === report.categoryId);
-  const text = `${category?.label ?? ''} ${report.description}`.toLocaleLowerCase('fr');
-  return ['incident', 'accident', 'danger immédiat', 'fuite', 'incendie', 'blessé', 'blessure', 'électrocution', 'effondrement', 'risque industriel'].some((term) => text.includes(term));
+  return report.dangerImmediate === true;
 }
 function Metric({ value, label, tone = 'green' }: { value: number; label: string; tone?: 'green' | 'amber' | 'red' }) {
   return <View style={styles.metric}><Text style={[styles.metricValue, tone === 'red' && { color: theme.colors.danger }, tone === 'amber' && { color: '#946713' }]}>{value}</Text><Text style={styles.metricLabel}>{label}</Text></View>;
@@ -41,10 +39,10 @@ export default function OperationsScreen() {
   const refresh = useCallback(async () => {
     setLoading(true);
     try { setReports(await listReports()); }
-    catch { Alert.alert('Chargement impossible', 'Les signalements locaux n’ont pas pu être lus.'); }
+    catch (error: unknown) { Alert.alert('Chargement impossible', error instanceof Error ? error.message : 'Les signalements locaux n’ont pas pu être lus.'); }
     finally { setLoading(false); }
   }, []);
-  useFocusEffect(useCallback(() => { let active = true; listReports().then((items) => { if (active) setReports(items); }).catch(() => { if (active) setReports([]); }).finally(() => { if (active) setLoading(false); }); return () => { active = false; }; }, []));
+  useFocusEffect(useCallback(() => { let active = true; listReports().then((items) => { if (active) setReports(items); }).catch((error: unknown) => { if (active) Alert.alert('Données locales à vérifier', error instanceof Error ? error.message : 'Les signalements enregistrés sur cet appareil n’ont pas pu être lus. Aucun dossier ne sera remplacé automatiquement.'); }).finally(() => { if (active) setLoading(false); }); return () => { active = false; }; }, []));
   const counts = useMemo(() => ({
     total: reports.length,
     open: reports.filter((r) => !DONE.includes(r.status) && !ACTIVE.includes(r.status)).length,
@@ -65,7 +63,7 @@ export default function OperationsScreen() {
     if (savingId) return;
     setSavingId(report.id);
     const at = new Date().toISOString();
-    const updated: Report = { ...report, status, events: [...report.events, { status, at, note: `Statut modifié localement : ${statusLabel(status)}` }] };
+    const updated: Report = { ...report, status, events: [...report.events, { status, at, note: `Suivi personnel local : ${statusLabel(status)}` }] };
     try {
       await saveReport(updated);
       setReports((current) => current.map((item) => item.id === report.id ? updated : item));
@@ -75,7 +73,7 @@ export default function OperationsScreen() {
   };
   const requestStatusChange = (report: Report, status: ReportStatus) => {
     if (status === 'RESOLVED') {
-      Alert.alert('Confirmer la résolution', 'Confirmez-vous que le problème a été traité ? Cette action sera enregistrée localement sur cet appareil.', [
+      Alert.alert('Confirmer la résolution', 'Confirmez-vous que vous souhaitez marquer ce dossier comme résolu dans votre suivi personnel ? Cela ne valide pas une résolution officielle. L’action restera locale à cet appareil.', [
         { text: 'Annuler', style: 'cancel' },
         { text: 'Confirmer', onPress: () => { void changeStatus(report, status); } }
       ]);
@@ -86,8 +84,8 @@ export default function OperationsScreen() {
   const toggleDetails = (id: string) => setExpandedIds((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
   return <ScrollView contentContainerStyle={styles.page}>
     <View style={styles.hero}>
-      <View style={styles.heroTop}><View style={styles.heroIcon}><Ionicons name="clipboard-outline" size={24} color={theme.colors.forest} /></View><View style={{ flex: 1 }}><Text style={styles.eyebrow}>MAGUISSI BIRR · QHSE</Text><Text style={styles.heroTitle}>Centre d’opérations</Text></View><Pressable accessibilityRole="button" accessibilityLabel="Actualiser" onPress={refresh} style={styles.refresh}><Ionicons name="refresh-outline" size={20} color={theme.colors.white} /></Pressable></View>
-      <Text style={styles.heroBody}>Une vue de travail pour trier les signalements, repérer les situations prioritaires et tracer les actions réalisées.</Text>
+      <View style={styles.heroTop}><View style={styles.heroIcon}><Ionicons name="clipboard-outline" size={24} color={theme.colors.forest} /></View><View style={{ flex: 1 }}><Text style={styles.eyebrow}>MAGUISSI BIRR · QHSE</Text><Text style={styles.heroTitle}>Suivi personnel</Text></View><Pressable accessibilityRole="button" accessibilityLabel="Actualiser" onPress={refresh} style={styles.refresh}><Ionicons name="refresh-outline" size={20} color={theme.colors.white} /></Pressable></View>
+      <Text style={styles.heroBody}>Un espace personnel pour consulter vos dossiers et noter votre suivi sur cet appareil. Les changements ne sont ni des affectations officielles ni des résolutions validées par une équipe.</Text>
       <View style={styles.metrics}><Metric value={counts.total} label="Total" /><Metric value={counts.open} label="À traiter" tone="amber" /><Metric value={counts.progress} label="En cours" /><Metric value={counts.priority} label="Prioritaires" tone="red" /></View>
     </View>
     <View style={styles.localNotice}><Ionicons name="phone-portrait-outline" size={18} color="#715314" /><Text style={styles.localNoticeText}>Mode local : les dossiers et changements de statut restent sur cet appareil. Aucune équipe distante n’est notifiée et aucune affectation réelle n’est envoyée.</Text></View>
