@@ -37,6 +37,12 @@ describe('isValidReport', () => {
     expect(isValidReport(null)).toBe(false);
     expect(isValidReport({ ...validReport, createdAt: 'not-a-date' })).toBe(false);
   });
+  it('rejects unsafe coordinates, too many photos, and malformed event history', () => {
+    expect(isValidReport({ ...validReport, latitude: 91, longitude: 2 })).toBe(false);
+    expect(isValidReport({ ...validReport, latitude: 14 })).toBe(false);
+    expect(isValidReport({ ...validReport, photoUris: ['1', '2', '3', '4'] })).toBe(false);
+    expect(isValidReport({ ...validReport, events: [{ status: 'UNKNOWN', at: 'yesterday' }] })).toBe(false);
+  });
 });
 
 it('maps internal statuses to French labels', () => {
