@@ -12,6 +12,7 @@ Comparaison du plan et de la feuille de route avec le code présent sur `main` :
 - **Déjà présent** : formulaire local, 11 catégories, 14 régions, GPS facultatif, caméra/galerie, persistance et ré-encodage des photos, historique avec recherche/filtrage, partage manuel, export JSON et restauration additive.
 - **Déjà renforcé** : validation des sauvegardes, exclusion des URI de photos des sauvegardes, détection des données locales invalides, copie de récupération, protection contre les identifiants/références dupliqués et génération d’identifiants sans collision connue.
 - **À confirmer avant bêta** : CI des commits récents, essais sur Android réel, permissions acceptées/refusées, persistance après redémarrage, erreurs de stockage, sauvegarde/restauration réelle et TalkBack.
+- **Compatibilité de mise à jour à vérifier en priorité** : la version `v1.0.0` ne contient pas le champ facultatif `dangerImmediate`, et le validateur actuel autorise explicitement son absence ; les catégories et régions comparées sont inchangées. Cela ne suffit pas à identifier la cause du crash signalé après mise à jour : il faut reproduire l’upgrade sur appareil de test avec données préexistantes et relever le message exact, sans effacer les données.
 - **Reporté** : API et base serveur, synchronisation, comptes, notifications, affectation, console professionnelle, cartographie opérationnelle et enrichissements non bloquants. Ces tâches dépendent d’une décision opérationnelle de SES et ne doivent pas détourner l’effort des validations du MVP.
 - Les documents `WORKPLAN.md` et `ROADMAP.md` ont été réalignés sur cet état pour ne pas recréer les fonctionnalités déjà présentes.
 
@@ -33,7 +34,7 @@ Comparaison du plan et de la feuille de route avec le code présent sur `main` :
 
 ## Règles permanentes
 
-- Continuer sur `main), comme demandé.
+- Continuer sur `main`, comme demandé.
 - Garder MAGUISSI BIRR distinct de VJR 221.
 - Ne jamais supprimer ni remplacer silencieusement les données de signalement.
 - Ne pas inventer de résultats de test, de transmissions serveur ou de statuts de dossier.
