@@ -33,6 +33,7 @@ Comparaison du plan et de la feuille de route avec le code présent sur `main` :
 - `5ad7544` et `49be806` : libellés d’accessibilité pour la navigation et le formulaire.
 - `df6a633`, `93eeb04` et `25463f3` : persistance séquentielle des photos et tests de nettoyage des copies partielles si une étape échoue. Ces nouveaux tests sont ajoutés au dépôt, mais leur exécution CI n’est pas encore confirmée.
 - `fcac390b` et `e9e4dfb9` : une valeur de stockage vide (`""`) n’est plus confondue avec une clé absente ; elle est conservée dans la copie de récupération et signalée comme donnée malformée.
+- `2f1c1ec7` : l’écran des signalements distingue désormais une erreur de lecture des données d’une liste réellement vide ; il explique de ne pas créer une sauvegarde vide ni désinstaller l’application pendant le diagnostic.
 
 ## Règles permanentes
 
