@@ -11,10 +11,22 @@ export type ReportBackup = {
   reports: Report[];
 };
 
+function hasUniqueIdentities(reports: Report[]): boolean {
+  const ids = new Set<string>();
+  const references = new Set<string>();
+  for (const report of reports) {
+    if (ids.has(report.id) || references.has(report.reference)) return false;
+    ids.add(report.id);
+    references.add(report.reference);
+  }
+  return true;
+}
+
 /** Photos are intentionally excluded: local file URIs cannot be restored on another device. */
 export function createReportBackup(reports: Report[], exportedAt = new Date().toISOString()): string {
   if (!Number.isFinite(Date.parse(exportedAt))) throw new Error('La date de création de la sauvegarde est invalide.');
   if (!reports.every(isValidReport)) throw new Error('Impossible de sauvegarder des signalements invalides.');
+  if (!hasUniqueIdentities(reports)) throw new Error('Impossible de sauvegarder des signalements avec des identifiants ou références en double.');
   const document: ReportBackup = {
     app: REPORT_BACKUP_APP,
     schemaVersion: REPORT_BACKUP_VERSION,
@@ -44,6 +56,9 @@ export function parseReportBackup(raw: string): Report[] {
   });
   if (!reports.every(isValidReport)) {
     throw new Error('La sauvegarde contient des signalements invalides. Aucune donnée n’a été modifiée.');
+  }
+  if (!hasUniqueIdentities(reports)) {
+    throw new Error('La sauvegarde contient des identifiants ou références en double. Aucune donnée n’a été modifiée.');
   }
   return reports;
 }
