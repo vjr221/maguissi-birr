@@ -3,7 +3,7 @@
 Cette checklist complète les contrôles automatisés. Elle ne remplace pas un essai sur un téléphone Android réel ni la validation des procédures QHSE par les personnes responsables.
 
 ### Résultat automatisé vérifié — 10 octobre 2026
-Le workflow [Android test APK, run 38010274393](https://github.com/vjr221/maguissi-birr/actions/runs/38010274393) a réussi sur le commit `4090d9c5d14e5c2c4a2ffe66ddb34b3811afc74c` : TypeScript et tests unitaires, Expo Doctor, compatibilité des dépendances, bundle Android, génération native, build APK release et démarrage à froid sur émulateur. L’APK de test archivé avait le SHA-256 `8a8fdb58420d9a43a3e4b8e3abb493849a1a16488b9bf5cc3252570d9f4eec60` et était annoncé comme valide jusqu’au 24 octobre 2026. Depuis ce contrôle, le code applicatif a changé : `5ad75448e44a544466a33f75234afb664b5ebff1` améliore les libellés des onglets, et `49be8067ff5866a90c90879d8a2eb436d8a61879` améliore l’accessibilité du formulaire. **Le résultat CI de ces derniers changements reste à confirmer** ; le contrôle précédent ne les valide pas. Cette validation ne remplace pas les essais sur téléphone réel et ne constitue pas une release publique.
+Le workflow [Android test APK, run 38010274393](https://github.com/vjr221/maguissi-birr/actions/runs/38010274393) a réussi sur le commit `4090d9c5d14e5c2c4a2ffe66ddb34b3811afc74c` : TypeScript et tests unitaires, Expo Doctor, compatibilité des dépendances, bundle Android, génération native, build APK release et démarrage à froid sur émulateur. L’APK de test archivé avait le SHA-256 `8a8fdb58420d9a43a3e4b8e3abb493849a1a16488b9bf5cc3252570d9f4eec60` et était annoncé comme valide jusqu’au 24 octobre 2026. Depuis ce contrôle, le code applicatif a changé : `5ad75448e44a544466a33f75234afb664b5ebff1` améliore les libellés des onglets, `49be8067ff5866a90c90879d8a2eb436d8a61879` améliore l’accessibilité du formulaire, et les commits `a2fec1e2e0084fbc7481fc8bc27c2ff3d06aba66`, `4d6e294df91e18f9431a1b4a7466f4ed7e3da473` et `14807ef69572a3420eb5dd11dff867d6eadd1948` renforcent la génération des identifiants locaux et ajoutent des tests de collision. **Le résultat CI de ces derniers changements reste à confirmer** ; le contrôle précédent ne les valide pas. Cette validation ne remplace pas les essais sur téléphone réel et ne constitue pas une release publique.
 
 ## 1. Build et qualité logicielle
 - [x] CI : vérification TypeScript et tests unitaires réussis (run 38010274393).
@@ -20,6 +20,7 @@ Le workflow [Android test APK, run 38010274393](https://github.com/vjr221/maguis
 - [ ] Créer un signalement avec GPS autorisé, puis avec permission refusée.
 - [ ] Ajouter, prévisualiser et supprimer des photos ; vérifier que les photos restent accessibles après fermeture/réouverture.
 - [ ] Vérifier la validation des champs, la référence unique et la prévention du double envoi.
+- [ ] Vérifier que la génération d’identifiant/référence retente une collision et affiche une erreur sûre si les tentatives sont épuisées.
 - [ ] Rechercher, filtrer et ouvrir les signalements ; modifier le statut et vérifier l’historique.
 - [ ] Vérifier qu’une erreur de lecture ne se transforme pas en liste vide et n’écrase pas les données.
 - [ ] Exporter une sauvegarde JSON ; confirmer que les photos ne sont pas incluses et que l’avertissement sur les lieux/GPS est affiché.
