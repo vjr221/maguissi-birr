@@ -27,7 +27,9 @@ function hasUniqueIdentities(reports: Report[]): boolean {
 
 export async function listReports(): Promise<Report[]> {
   const raw = await AsyncStorage.getItem(KEY);
-  if (!raw) return [];
+  // Only a missing key means an empty store. An empty string is stored data
+  // that cannot be parsed, so preserve it as a recovery snapshot instead.
+  if (raw === null) return [];
 
   let parsed: unknown;
   try {
