@@ -63,7 +63,7 @@ jobs:
       - name: TypeScript and tests
         run: |
           npm run typecheck
-          npm test -- --passWithNoTests
+          npm test -- --ci
 
       - name: Export Android JavaScript bundle
         run: npx expo export --platform android
