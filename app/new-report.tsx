@@ -4,7 +4,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system/legacy';
 import { persistReportPhoto } from '@/utils/persistReportPhoto';
+import { persistReportPhotos } from '@/utils/persistReportPhotos';
 import { REPORT_CATEGORIES, REGIONS } from '@/constants/categories';
 import { theme } from '@/constants/theme';
 import { listReports, saveReport } from '@/services/reportStore';
@@ -64,7 +66,11 @@ export default function NewReportScreen() {
       // Read first so damaged local data is detected before copying photos.
       const currentReports = await listReports();
       const identity = createUniqueReportIdentity(currentReports);
-      const persistentPhotoUris = await Promise.all(photoUris.map(persistReportPhoto));
+      const persistentPhotoUris = await persistReportPhotos(
+        photoUris,
+        persistReportPhoto,
+        (uri) => FileSystem.deleteAsync(uri, { idempotent: true })
+      );
       const now = new Date().toISOString();
       const report: Report = { ...identity, categoryId, description: description.trim(), dangerImmediate, region, locality: locality.trim() || undefined, ...coords, photoUris: persistentPhotoUris, createdAt: now, status: 'RECEIVED', events: [{ status: 'RECEIVED', at: now, note: 'Enregistré sur cet appareil' }] };
       await saveReport(report);
