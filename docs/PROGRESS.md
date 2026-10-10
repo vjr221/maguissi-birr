@@ -7,8 +7,8 @@ Identité : projet indépendant de VJR 221.
 
 ## État à reprendre lors de la prochaine session
 
-- Dernier changement de code : `ce08abf86696691bddd89f3e627d6f9722202a35` — tests de régression pour les doublons d’identifiants/références dans les sauvegardes.
-- Changement de logique associé : `71fff68843d7fec489d3d7fc6b82d568cf449b2c` — rejet des sauvegardes exportées ou importées qui contiennent des identifiants ou références en double.
+- Derniers changements de code : `9fc9083bed530c1bfae7b03380cef987016bd043` (stockage local) et `7eb80929d08300922ed5943ed7227187c5d42aa5` (tests du stockage local).
+- Changements de sauvegarde précédents : `71fff68843d7fec489d3d7fc6b82d568cf449b2c` (rejet des identifiants/références en double à l’export/import) et `ce08abf86696691bddd89f3e627d6f9722202a35` (tests de sauvegarde).
 - Changements applicatifs précédents : `49be8067ff5866a90c90879d8a2eb436d8a61879` (accessibilité du formulaire) et `5ad75448e44a544466a33f75234afb664b5ebff1` (libellés de navigation).
 - Les changements sont écrits sur `main`. **La CI pour les commits récents n’a pas été confirmée** : le connecteur GitHub disponible permet de consulter les tâches d’un run connu, mais ne fournit pas ici la liste des derniers runs push. Ne pas assimiler cette limite d’observation à un succès ou à un échec CI.
 - Le workflow CI de `.github/workflows/ci.yml` exécute `npm install --no-audit --no-fund`, `npm run typecheck` et `npm test -- --ci`.
@@ -16,6 +16,12 @@ Identité : projet indépendant de VJR 221.
 - Version déclarée dans `package.json` et `app.json` : `1.0.1`. Ne pas publier de release finale sur la seule base du build de test.
 
 ## Changements récents
+
+### Intégrité du stockage local — commits `9fc9083` et `7eb8092`
+- La lecture des dossiers locaux détecte désormais les identifiants ou références dupliqués, conserve une copie brute de récupération et bloque les opérations normales au lieu de continuer avec des données ambiguës.
+- L’enregistrement refuse d’attribuer à un nouveau dossier une référence déjà utilisée par un autre dossier.
+- Les tests couvrent la sauvegarde de récupération pour des données dupliquées et le refus d’une référence conflictuelle.
+- Ces protections ne suppriment ni ne réparent automatiquement les données en conflit : elles les préservent pour investigation.
 
 ### Intégrité des sauvegardes — commits `71fff68` et `ce08abf`
 - L’export refuse désormais une collection qui contient des identifiants de dossier ou des références en double.
@@ -40,7 +46,7 @@ Ces changements nécessitent encore les vérifications TypeScript/tests via CI e
 - Une référence locale n’est pas un numéro officiel et ne doit pas être présentée comme une preuve de transmission.
 - Si les données locales sont malformées, le stockage conserve une copie de récupération et refuse de remplacer silencieusement les dossiers.
 - La restauration d’une sauvegarde est additive : les dossiers existants gagnent en cas de conflit et les médias/URI locaux ne sont pas importés depuis une autre installation.
-- Les métadonnées de sauvegarde sont validées ; les tests couvrent les fichiers malformés, les conflits et désormais les identifiants/références dupliqués.
+- Les métadonnées de sauvegarde sont validées ; les tests couvrent les fichiers malformés, les conflits et les identifiants/références dupliqués à l’import/export comme dans le stockage local.
 
 ## Prochaines actions, dans l’ordre
 
