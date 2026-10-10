@@ -34,6 +34,7 @@ Comparaison du plan et de la feuille de route avec le code présent sur `main` :
 - `df6a633`, `93eeb04` et `25463f3` : persistance séquentielle des photos et tests de nettoyage des copies partielles si une étape échoue. Ces nouveaux tests sont ajoutés au dépôt, mais leur exécution CI n’est pas encore confirmée.
 - `fcac390b` et `e9e4dfb9` : une valeur de stockage vide (`""`) n’est plus confondue avec une clé absente ; elle est conservée dans la copie de récupération et signalée comme donnée malformée.
 - `2f1c1ec7` : l’écran des signalements distingue désormais une erreur de lecture des données d’une liste réellement vide ; il explique de ne pas créer une sauvegarde vide ni désinstaller l’application pendant le diagnostic.
+- `f0d5c4b7` et `61f25700` : la récupération ne prétend plus qu’une copie actuelle a été conservée si une ancienne sauvegarde différente existe déjà ou si l’écriture échoue ; des tests couvrent ces cas sans écraser la copie préexistante.
 
 ## Règles permanentes
 
