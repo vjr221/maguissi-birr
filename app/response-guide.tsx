@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '@/constants/theme';
 
@@ -31,6 +31,14 @@ function StepCard({ step, index }: { step: GuideStep; index: number }) {
   return <View style={styles.stepRow}><View style={styles.stepNumber}><Text style={styles.stepNumberText}>{index + 1}</Text></View><View style={styles.stepCopy}><Text style={styles.stepTitle}>{step.title}</Text><Text style={styles.body}>{step.body}</Text></View></View>;
 }
 
+async function callEmergency(number: string) {
+  try {
+    await Linking.openURL(`tel:${number}`);
+  } catch {
+    Alert.alert('Appel indisponible', `Impossible d’ouvrir le téléphone. Composez directement le ${number} si vous êtes en mesure de le faire.`);
+  }
+}
+
 export default function ResponseGuideScreen() {
   return <ScrollView contentContainerStyle={styles.page}>
     <View style={styles.hero}>
@@ -40,6 +48,15 @@ export default function ResponseGuideScreen() {
       <Text style={styles.heroBody}>Un mémo pratique pour réagir sans aggraver la situation. Les consignes d’urgence du site et les secours compétents restent prioritaires.</Text>
     </View>
     <View style={styles.critical}><Ionicons name="alert-circle" size={23} color={theme.colors.danger} /><View style={{ flex: 1 }}><Text style={styles.criticalTitle}>Danger immédiat ?</Text><Text style={styles.body}>N’attendez pas de remplir l’application. Éloignez-vous, alertez immédiatement les secours et appliquez la procédure d’urgence locale.</Text></View></View>
+    <View style={styles.emergencyCard}>
+      <Text style={styles.emergencyTitle}>Appeler les secours au Sénégal</Text>
+      <Text style={styles.emergencyNote}>En cas de danger, appelez directement les secours. MAGUISSI BIRR ne transmet pas d’alerte automatiquement.</Text>
+      <View style={styles.emergencyActions}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Appeler les pompiers au 18" onPress={() => void callEmergency('18')} style={styles.emergencyButton}><Text style={styles.emergencyNumber}>18</Text><Text style={styles.emergencyLabel}>Pompiers</Text></Pressable>
+        <Pressable accessibilityRole="button" accessibilityLabel="Appeler la police au 17" onPress={() => void callEmergency('17')} style={styles.emergencyButton}><Text style={styles.emergencyNumber}>17</Text><Text style={styles.emergencyLabel}>Police secours</Text></Pressable>
+        <Pressable accessibilityRole="button" accessibilityLabel="Appeler le SAMU au 1515" onPress={() => void callEmergency('1515')} style={styles.emergencyButton}><Text style={styles.emergencyNumber}>1515</Text><Text style={styles.emergencyLabel}>SAMU</Text></Pressable>
+      </View>
+    </View>
     <Text style={styles.sectionTitle}>Les 4 priorités</Text>
     <View style={styles.card}>{PRIORITIES.map((step, index) => <StepCard key={step.title} step={step} index={index} />)}</View>
     <Text style={styles.sectionTitle}>Réflexes selon la situation</Text>
@@ -61,6 +78,13 @@ const styles = StyleSheet.create({
   heroBody: { color: theme.colors.muted, fontSize: 14, lineHeight: 21 },
   critical: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, padding: 16, borderWidth: 1, borderColor: '#F1C5C1', borderRadius: theme.radius.md, backgroundColor: '#FFF4F2' },
   criticalTitle: { fontSize: 16, fontWeight: '800', color: theme.colors.danger, marginBottom: 4 },
+  emergencyCard: { backgroundColor: theme.colors.white, borderRadius: theme.radius.md, padding: 15, borderWidth: 1, borderColor: '#F1C5C1', gap: 10 },
+  emergencyTitle: { color: theme.colors.ink, fontSize: 17, fontWeight: '800' },
+  emergencyNote: { color: theme.colors.muted, fontSize: 12, lineHeight: 18 },
+  emergencyActions: { flexDirection: 'row', gap: 8 },
+  emergencyButton: { flex: 1, minHeight: 68, paddingVertical: 10, borderRadius: 12, backgroundColor: '#FFF4F2', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#F1C5C1' },
+  emergencyNumber: { color: theme.colors.danger, fontSize: 23, fontWeight: '900' },
+  emergencyLabel: { color: theme.colors.ink, fontSize: 11, fontWeight: '700', textAlign: 'center' },
   sectionTitle: { color: theme.colors.ink, fontSize: 19, fontWeight: '800', marginTop: 3 },
   card: { backgroundColor: theme.colors.white, borderRadius: theme.radius.md, padding: 16, borderWidth: 1, borderColor: theme.colors.border, gap: 18 },
   stepRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
