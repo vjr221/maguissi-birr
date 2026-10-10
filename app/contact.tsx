@@ -38,13 +38,13 @@ export default function ContactScreen() {
       </Pressable>
     </View>
 
-    <Text style={styles.sectionTitle}>Contacter le manager</Text>
+    <Text style={styles.sectionTitle}>Contacter Sen Environnement Services</Text>
     <View style={styles.contactCard}>
       <View style={styles.avatar}><Ionicons name="person" size={25} color={theme.colors.forest} /></View>
       <View style={{ flex: 1, gap: 3 }}>
         <Text style={styles.manager}>M. Diallo</Text>
         <Text style={styles.muted}>Manager · Sen Environnement Services</Text>
-        <Text style={styles.phone}>{'+221 77 475 21 21'}</Text>
+        <Text style={styles.phone}>{PHONE}</Text>
       </View>
     </View>
     <ContactAction icon="call-outline" title="Appeler" detail="Contacter directement le manager" onPress={() => openLink('tel:' + PHONE)} accent />
