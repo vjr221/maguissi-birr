@@ -41,6 +41,7 @@ Tester GPS et médias sur un appareil réel. Consulter l'onglet Actions du dép�
 - [Workflow QHSE](docs/WORKFLOW.md)
 - [Guide environnemental](docs/ENVIRONMENT_GUIDE.md)
 - [Plan de développement](docs/WORKPLAN.md)
+- [Checklist de validation avant publication](docs/RELEASE_QA_CHECKLIST.md)
 - [Feuille de route](docs/ROADMAP.md)
 - [Politique de sécurité](SECURITY.md)
 
