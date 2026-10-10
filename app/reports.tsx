@@ -4,14 +4,13 @@ import { Alert, Linking, Pressable, ScrollView, Share, StyleSheet, Text, TextInp
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
-import { listReports } from '@/services/reportStore';
+import { listReports, restoreReportsFromBackup } from '@/services/reportStore';
 import type { Report } from '@/types/report';
 import { theme } from '@/constants/theme';
 import { statusLabel } from '@/utils/reportValidation';
 import { REPORT_CATEGORIES } from '@/constants/categories';
 import { SES_CONTACT } from '@/constants/contact';
 import { createReportBackup } from '@/utils/reportBackup';
-import { restoreReportsFromBackup } from '@/services/reportStore';
 
 export default function ReportsScreen() {
   const [reports, setReports] = useState<Report[]>([]);
