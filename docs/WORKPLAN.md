@@ -14,6 +14,8 @@ Ce plan distingue le code déjà présent, les validations qui bloquent une diff
 - [x] Validation des signalements et protections contre les données malformées, identifiants/références en double et collisions.
 - [x] Premiers tests unitaires, workflow CI et documentation produit.
 - [ ] Confirmer la CI sur les commits récents (typecheck et tests Jest) et corriger tout échec observé.
+- [ ] Reproduire le scénario de mise à jour depuis la version publiée précédente sur un appareil de test, en conservant les données locales ; relever le message exact du crash avant de conclure à une cause.
+- [ ] Vérifier que les signalements créés avec l’ancien schéma restent lisibles et que toute migration éventuelle est additive et réversible.
 - [ ] Installer la version candidate sur un téléphone Android réel ; tester démarrage à froid, navigation, clavier et zones sûres.
 - [ ] Tester permissions GPS/caméra/galerie acceptées et refusées, ainsi que l’absence de réseau et le stockage insuffisant.
 - [ ] Vérifier les photos après fermeture/redémarrage, la création de signalements et la recherche/historique.
