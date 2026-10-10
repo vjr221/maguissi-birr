@@ -13,6 +13,8 @@ export type ReportBackup = {
 
 /** Photos are intentionally excluded: local file URIs cannot be restored on another device. */
 export function createReportBackup(reports: Report[], exportedAt = new Date().toISOString()): string {
+  if (!Number.isFinite(Date.parse(exportedAt))) throw new Error('La date de création de la sauvegarde est invalide.');
+  if (!reports.every(isValidReport)) throw new Error('Impossible de sauvegarder des signalements invalides.');
   const document: ReportBackup = {
     app: REPORT_BACKUP_APP,
     schemaVersion: REPORT_BACKUP_VERSION,
@@ -32,7 +34,7 @@ export function parseReportBackup(raw: string): Report[] {
   }
   if (!parsed || typeof parsed !== 'object') throw new Error('Le fichier de sauvegarde est invalide.');
   const document = parsed as Partial<ReportBackup>;
-  if (document.app !== REPORT_BACKUP_APP || document.schemaVersion !== REPORT_BACKUP_VERSION || !Array.isArray(document.reports)) {
+  if (document.app !== REPORT_BACKUP_APP || document.schemaVersion !== REPORT_BACKUP_VERSION || !Array.isArray(document.reports) || typeof document.exportedAt !== 'string' || !Number.isFinite(Date.parse(document.exportedAt))) {
     throw new Error('Ce fichier n’est pas une sauvegarde MAGUISSI BIRR compatible.');
   }
   const reports = document.reports.map((item) => {
