@@ -23,6 +23,8 @@ La priorité est de rendre le MVP local fiable. Les fonctions serveur, la consol
 
 ### Validation encore requise avant bêta
 - [ ] Confirmer TypeScript et Jest sur le dernier commit candidat.
+- [ ] Reproduire la mise à jour depuis la version précédente sur un appareil de test, sans effacer les données ; enregistrer le message exact en cas de crash.
+- [ ] Vérifier la lecture des signalements historiques et la compatibilité des données avant/après mise à jour.
 - [ ] Tester sur un téléphone Android réel : démarrage, navigation, clavier, zones sûres et permissions.
 - [ ] Tester la persistance des photos et des signalements après redémarrage, les erreurs de stockage et les sauvegardes.
 - [ ] Vérifier TalkBack, messages d’erreur et parcours sans permissions.
