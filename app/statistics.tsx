@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useFocusEffect } from 'expo-router';
-import { ScrollView, StyleSheet, Text, View, Pressable } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, View, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { listReports } from '@/services/reportStore';
 import type { Report } from '@/types/report';
@@ -22,7 +22,7 @@ export default function StatisticsScreen() {
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState<Period>('all');
-  useFocusEffect(useCallback(() => { let active = true; setLoading(true); listReports().then(items => { if (active) setReports(items); }).catch(() => { if (active) setReports([]); }).finally(() => { if (active) setLoading(false); }); return () => { active = false; }; }, []));
+  useFocusEffect(useCallback(() => { let active = true; setLoading(true); listReports().then(items => { if (active) setReports(items); }).catch((error: unknown) => { if (active) Alert.alert('Statistiques indisponibles', error instanceof Error ? error.message : 'Les données locales ne peuvent pas être lues.'); }).finally(() => { if (active) setLoading(false); }); return () => { active = false; }; }, []));
   const filtered = useMemo(() => {
     if (period === 'all') return reports;
     const cutoff = Date.now() - Number(period) * 24 * 60 * 60 * 1000;
