@@ -1,18 +1,14 @@
 import { Linking, ScrollView, StyleSheet, Text, View, Pressable, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '@/constants/theme';
+import { SES_CONTACT } from '@/constants/contact';
 
-const PHONE = '+221774752121';
-const WEBSITE = 'https://sen-environnement-services.com/';
-const EMAIL = 'info@sen-environnement-services.com';
+const PHONE = SES_CONTACT.phone;
+const WEBSITE = SES_CONTACT.website;
+const EMAIL = SES_CONTACT.email;
 
 async function openLink(url: string) {
   try {
-    const supported = await Linking.canOpenURL(url);
-    if (!supported) {
-      Alert.alert('Action indisponible', 'Aucune application compatible n’a été trouvée sur cet appareil.');
-      return;
-    }
     await Linking.openURL(url);
   } catch {
     Alert.alert('Impossible d’ouvrir le lien', 'Veuillez réessayer ou utiliser les coordonnées affichées.');
