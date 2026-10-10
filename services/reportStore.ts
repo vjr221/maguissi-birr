@@ -41,3 +41,17 @@ export async function saveReport(report: Report): Promise<void> {
   const current = await listReports();
   await AsyncStorage.setItem(KEY, JSON.stringify([report, ...current.filter((item) => item.id !== report.id)]));
 }
+
+import { mergeReportBackup, parseReportBackup } from '@/utils/reportBackup';
+
+/** Import a validated backup additively. Existing local reports are never overwritten. */
+export async function restoreReportsFromBackup(raw: string): Promise<{ added: number; skipped: number }> {
+  const imported = parseReportBackup(raw);
+  // listReports throws on damaged storage, preserving its recovery snapshot instead of overwriting it.
+  const current = await listReports();
+  const merged = mergeReportBackup(current, imported);
+  if (merged.added > 0) {
+    await AsyncStorage.setItem(KEY, JSON.stringify(merged.reports));
+  }
+  return { added: merged.added, skipped: merged.skipped };
+}

@@ -1,12 +1,17 @@
 import { useCallback, useState } from 'react';
 import { router, useFocusEffect } from 'expo-router';
 import { Alert, Linking, Pressable, ScrollView, Share, StyleSheet, Text, TextInput, View } from 'react-native';
+import * as DocumentPicker from 'expo-document-picker';
+import * as FileSystem from 'expo-file-system/legacy';
+import * as Sharing from 'expo-sharing';
 import { listReports } from '@/services/reportStore';
 import type { Report } from '@/types/report';
 import { theme } from '@/constants/theme';
 import { statusLabel } from '@/utils/reportValidation';
 import { REPORT_CATEGORIES } from '@/constants/categories';
 import { SES_CONTACT } from '@/constants/contact';
+import { createReportBackup } from '@/utils/reportBackup';
+import { restoreReportsFromBackup } from '@/services/reportStore';
 
 export default function ReportsScreen() {
   const [reports, setReports] = useState<Report[]>([]);
@@ -19,6 +24,55 @@ export default function ReportsScreen() {
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
   }, []));
+
+  const exportBackup = async () => {
+    if (reports.length === 0) {
+      Alert.alert('Aucune donnée à sauvegarder', 'Créez d’abord un signalement.');
+      return;
+    }
+    Alert.alert(
+      'Exporter une sauvegarde JSON ?',
+      'Le fichier contiendra les descriptions, les lieux et les éventuelles coordonnées GPS de vos signalements. Les photos ne sont pas incluses. Conservez ce fichier dans un endroit privé.',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        { text: 'Créer la sauvegarde', onPress: () => { void (async () => {
+          try {
+            const directory = FileSystem.cacheDirectory;
+            if (!directory) throw new Error('Le stockage temporaire est indisponible.');
+            const uri = `${directory}maguissi-birr-backup-${Date.now()}.json`;
+            await FileSystem.writeAsStringAsync(uri, createReportBackup(reports), { encoding: FileSystem.EncodingType.UTF8 });
+            if (!(await Sharing.isAvailableAsync())) throw new Error('Le partage de fichiers n’est pas disponible sur cet appareil.');
+            await Sharing.shareAsync(uri, { mimeType: 'application/json', dialogTitle: 'Sauvegarder MAGUISSI BIRR' });
+          } catch (error: unknown) {
+            Alert.alert('Export impossible', error instanceof Error ? error.message : 'La sauvegarde n’a pas pu être créée.');
+          }
+        })(); } }
+      ]
+    );
+  };
+
+  const importBackup = async () => {
+    Alert.alert(
+      'Restaurer une sauvegarde ?',
+      'Les signalements valides seront ajoutés sans remplacer les dossiers déjà présents. Les doublons seront ignorés et les photos ne pourront pas être restaurées depuis ce fichier.',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        { text: 'Choisir un fichier', onPress: () => { void (async () => {
+          try {
+            const picked = await DocumentPicker.getDocumentAsync({ type: ['application/json', 'text/json', 'public.json'], copyToCacheDirectory: true, multiple: false });
+            if (picked.canceled || !picked.assets[0]) return;
+            const raw = await FileSystem.readAsStringAsync(picked.assets[0].uri, { encoding: FileSystem.EncodingType.UTF8 });
+            const result = await restoreReportsFromBackup(raw);
+            const refreshed = await listReports();
+            setReports(refreshed);
+            Alert.alert('Restauration terminée', `${result.added} signalement(s) ajouté(s), ${result.skipped} doublon(s) ignoré(s).`);
+          } catch (error: unknown) {
+            Alert.alert('Restauration impossible', error instanceof Error ? error.message : 'Le fichier n’a pas pu être restauré. Aucune donnée existante n’a été volontairement remplacée.');
+          }
+        })(); } }
+      ]
+    );
+  };
 
   const shareSummary = async (report: Report) => {
     const category = REPORT_CATEGORIES.find((item) => item.id === report.categoryId)?.label ?? 'Autre situation';
@@ -87,6 +141,10 @@ export default function ReportsScreen() {
   return <ScrollView contentContainerStyle={styles.page}>
     <Text style={styles.intro}>Les signalements ci-dessous sont enregistrés sur cet appareil. Le suivi à distance sera disponible après mise en place de l'API sécurisée.</Text>
     <Text style={styles.emailNote}>Vous pouvez préparer manuellement un e-mail à SES pour transmettre un résumé. L’envoi reste sous votre contrôle et doit être confirmé dans votre messagerie.</Text>
+    <View style={styles.backupActions}>
+      <Pressable accessibilityRole="button" onPress={exportBackup} style={styles.backupButton}><Text style={styles.backupButtonText}>Exporter la sauvegarde</Text></Pressable>
+      <Pressable accessibilityRole="button" onPress={importBackup} style={styles.restoreButton}><Text style={styles.restoreButtonText}>Restaurer un fichier</Text></Pressable>
+    </View>
     {!loading && reports.length > 0 && <TextInput value={query} onChangeText={setQuery} placeholder="Rechercher par référence, région ou texte…" placeholderTextColor={theme.colors.muted} style={styles.search} />}
     {loading ? <View accessibilityRole="progressbar" style={styles.loadingCard}><Text style={styles.empty}>Chargement de vos signalements…</Text></View> : reports.length === 0 ? <View style={styles.emptyCard}><Text style={styles.emptyIcon}>🗂️</Text><Text style={styles.emptyTitle}>Aucun signalement enregistré</Text><Text style={styles.empty}>Déclarez une situation environnementale ou QHSE pour conserver une trace sur cet appareil.</Text><Pressable accessibilityRole="button" onPress={() => router.push('/new-report')} style={styles.primaryButton}><Text style={styles.primaryButtonText}>＋ Créer un signalement</Text></Pressable></View> : filteredReports.length === 0 ? <View style={styles.emptyCard}><Text style={styles.emptyTitle}>Aucun résultat</Text><Text style={styles.empty}>Essayez une autre référence, région ou expression.</Text><Pressable accessibilityRole="button" onPress={() => setQuery('')} style={styles.clearButton}><Text style={styles.clearButtonText}>Effacer la recherche</Text></Pressable></View> : <><Text style={styles.resultCount}>{filteredReports.length} signalement{filteredReports.length > 1 ? 's' : ''} {normalizedQuery ? 'trouvé' + (filteredReports.length > 1 ? 's' : '') : 'enregistré' + (filteredReports.length > 1 ? 's' : '')} · du plus récent au plus ancien</Text>{filteredReports.map((report) => <View key={report.id} style={styles.card}>
       <Text style={styles.ref}>{report.reference}</Text>
@@ -107,6 +165,11 @@ export default function ReportsScreen() {
 }
 const styles = StyleSheet.create({
   page: { padding: 18, gap: 12 },
+  backupActions: { flexDirection: 'row', gap: 10 },
+  backupButton: { flex: 1, backgroundColor: theme.colors.forest, borderRadius: 11, paddingVertical: 12, paddingHorizontal: 10, alignItems: 'center' },
+  backupButtonText: { color: theme.colors.white, fontWeight: '800', fontSize: 12, textAlign: 'center' },
+  restoreButton: { flex: 1, borderColor: theme.colors.forest, borderWidth: 1, borderRadius: 11, paddingVertical: 12, paddingHorizontal: 10, alignItems: 'center' },
+  restoreButtonText: { color: theme.colors.forest, fontWeight: '800', fontSize: 12, textAlign: 'center' },
   search: { backgroundColor: theme.colors.white, borderColor: theme.colors.border, borderWidth: 1, borderRadius: 13, padding: 13, color: theme.colors.ink, fontSize: 14 },
   category: { color: theme.colors.forest, fontSize: 12, fontWeight: '800' },
   dangerBadge: { alignSelf: 'flex-start', backgroundColor: '#FFF0EE', borderColor: '#E8A8A2', borderWidth: 1, borderRadius: 9, paddingHorizontal: 10, paddingVertical: 6 },
