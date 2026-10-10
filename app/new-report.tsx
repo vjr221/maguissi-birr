@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
+import { persistReportPhoto } from '@/utils/persistReportPhoto';
 import { REPORT_CATEGORIES, REGIONS } from '@/constants/categories';
 import { theme } from '@/constants/theme';
 import { saveReport } from '@/services/reportStore';
@@ -59,10 +60,11 @@ export default function NewReportScreen() {
     if (validationError) return Alert.alert('Description à corriger', validationError);
     setSaving(true);
     try {
+      const persistentPhotoUris = await Promise.all(photoUris.map(persistReportPhoto));
       const now = new Date().toISOString();
       const id = `${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
       const referenceSuffix = Math.random().toString(36).slice(2, 10).toUpperCase();
-      const report: Report = { id, reference: `MB-${new Date().getFullYear()}-${referenceSuffix}`, categoryId, description: description.trim(), dangerImmediate, region, locality: locality.trim() || undefined, ...coords, photoUris, createdAt: now, status: 'RECEIVED', events: [{ status: 'RECEIVED', at: now, note: 'Enregistré sur cet appareil' }] };
+      const report: Report = { id, reference: `MB-${new Date().getFullYear()}-${referenceSuffix}`, categoryId, description: description.trim(), dangerImmediate, region, locality: locality.trim() || undefined, ...coords, photoUris: persistentPhotoUris, createdAt: now, status: 'RECEIVED', events: [{ status: 'RECEIVED', at: now, note: 'Enregistré sur cet appareil' }] };
       await saveReport(report);
       Alert.alert('Signalement enregistré', `Référence locale : ${report.reference}. Elle est conservée sur cet appareil et n'a pas été transmise à un serveur.`, [
         { text: 'Partager la référence', onPress: () => { void Share.share({ message: `MAGUISSI BIRR — Référence locale ${report.reference}. Ce signalement n'a pas encore été transmis à un serveur.` }); } },
