@@ -46,3 +46,5 @@ Comparaison du plan et de la feuille de route avec le code présent sur `main` :
 - Ne pas publier de release finale avant validation des contrôles automatisés, essais sur téléphone réel et exigences opérationnelles.
 
 - `6d93fc6e` : l’écran Statistiques distingue désormais une erreur de lecture des données d’un véritable total à zéro ; les indicateurs ne sont pas affichés lorsque les données locales sont illisibles.
+
+- `7e7dddec` : le Centre d’opérations masque désormais ses compteurs et sa file quand le stockage local est illisible, bloque les changements de statut et propose de réessayer. Le test manuel correspondant est ajouté à la checklist QA ; la validation CI de ce changement reste en cours.
